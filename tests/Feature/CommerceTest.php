@@ -28,10 +28,14 @@ class CommerceTest extends TestCase
         $this->get('/gold-prices')
             ->assertOk()
             ->assertSee('Gold prices, in perspective')
-            ->assertSee('history-date-range', escape: false)
-            ->assertSee('Observation date');
-        $this->getJson(route('gold-prices.data'))
+            ->assertSee('Gold price trend')
+            ->assertSee('data-range="1m"', escape: false)
+            ->assertSee('INR per 10 grams');
+        $this->getJson(route('gold-prices.data', ['range' => '5d']))
             ->assertOk()
+            ->assertJsonPath('range', '5d')
+            ->assertJsonPath('chart_unit_grams', 10)
+            ->assertJsonCount(5, 'history.24K')
             ->assertJsonStructure([
                 'currency',
                 'unit',

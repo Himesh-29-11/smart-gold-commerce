@@ -74,26 +74,37 @@
         </div>
 
         <div class="market-layout">
-            <article class="chart-panel">
-                <div class="section-heading">
+            <article class="chart-panel trend-chart-panel">
+                <div class="trend-chart-heading">
                     <div>
-                        <span class="kicker dark">30-day movement</span>
-                        <h2>Real price history</h2>
+                        <span class="kicker">Authorized market history</span>
+                        <h2>Gold price trend</h2>
+                        <small>INR per 10 grams</small>
                     </div>
-                    <div class="chart-header-meta">
-                        <span id="history-date-range" class="history-date-range">Last 30 calendar days</span>
-                        <div class="chart-legend">
-                            <span class="dot dot-24"></span>24K
-                            <span class="dot dot-22"></span>22K
-                        </div>
+                    <div class="carat-switch" aria-label="Select gold purity">
+                        <button class="active" type="button" data-carat="24K">24K</button>
+                        <button type="button" data-carat="22K">22K</button>
                     </div>
                 </div>
-                <div class="chart-box">
+
+                <div class="range-tabs" aria-label="Select chart period">
+                    <button type="button" data-range="5d">5D</button>
+                    <button class="active" type="button" data-range="1m">1M</button>
+                    <button type="button" data-range="1y">1Y</button>
+                    <button type="button" data-range="max">Max</button>
+                </div>
+
+                <div class="chart-box trend-chart-box">
                     <canvas id="goldChart" aria-label="Authorized gold price history graph"></canvas>
-                    <div id="chart-empty" class="chart-empty" hidden>
+                    <div id="chart-empty" class="chart-empty dark" hidden>
                         <strong>Genuine history is being collected</strong>
                         <span>Backfill an authorized historical feed or keep the scheduler running to build the graph.</span>
                     </div>
+                </div>
+
+                <div class="trend-chart-footer">
+                    <span id="history-date-range">Last 30 calendar days</span>
+                    <span id="chart-series-label">24K · 10g</span>
                 </div>
             </article>
 
@@ -154,12 +165,25 @@
             const status = document.getElementById('dashboard-status');
             const emptyState = document.getElementById('chart-empty');
             const dateRange = document.getElementById('history-date-range');
+            const seriesLabel = document.getElementById('chart-series-label');
+            const rangeButtons = document.querySelectorAll('[data-range]');
+            const caratButtons = document.querySelectorAll('[data-carat]');
             const money = new Intl.NumberFormat('en-IN', {
                 style: 'currency',
                 currency: 'INR',
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
+            const axisMoney = new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            });
+            const state = {
+                range: '1m',
+                carat: '24K',
+                history: initialHistory
+            };
             let chart;
 
             const parseHistoryDate = value => {
@@ -175,82 +199,129 @@
                 month: 'short',
                 year: 'numeric'
             });
+            const tooltipDate = value => parseHistoryDate(value).toLocaleDateString('en-IN', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short'
+            });
+            const selectedPoints = history => (history[state.carat] || []).map(point => ({
+                x: point.x,
+                y: Number(point.y) * 10
+            }));
+            const lineColor = () => state.carat === '24K' ? '#ff867c' : '#71c7ad';
+            const fillColor = () => state.carat === '24K' ? 'rgba(255,134,124,.14)' : 'rgba(113,199,173,.14)';
+            const dataset = history => ({
+                label: state.carat,
+                data: selectedPoints(history),
+                borderColor: lineColor(),
+                backgroundColor: fillColor(),
+                borderWidth: 2.5,
+                tension: .18,
+                fill: true,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                pointHoverBackgroundColor: lineColor(),
+                pointHoverBorderColor: lineColor()
+            });
             const updateDateRange = history => {
-                const dates = [...new Set([
-                    ...(history['24K'] || []).map(point => point.x),
-                    ...(history['22K'] || []).map(point => point.x)
-                ])].sort();
-
+                const dates = selectedPoints(history).map(point => point.x).sort();
                 dateRange.textContent = dates.length
                     ? (dates.length === 1 ? fullDate(dates[0]) : shortDate(dates[0]) + ' – ' + fullDate(dates[dates.length - 1]))
                     : 'No authorized dates available';
+                seriesLabel.textContent = state.carat + ' · 10g';
+            };
+            const setEmptyState = history => {
+                emptyState.hidden = selectedPoints(history).length >= 2;
+            };
+            const updateChart = (history, animate = false) => {
+                state.history = history;
+                updateDateRange(history);
+                setEmptyState(history);
+                if (!chart) return;
+                chart.data.datasets = [dataset(history)];
+                chart.update(animate ? undefined : 'none');
             };
 
-            const datasets = history => [{
-                label: '24K',
-                data: history['24K'] || [],
-                borderColor: '#b8862f',
-                backgroundColor: 'rgba(184,134,47,.1)',
-                tension: .35,
-                fill: true,
-                pointRadius: 2
-            }, {
-                label: '22K',
-                data: history['22K'] || [],
-                borderColor: '#173c34',
-                backgroundColor: 'transparent',
-                tension: .35,
-                pointRadius: 2
-            }];
-
-            const setEmptyState = history => {
-                const points = Math.max(history['24K']?.length || 0, history['22K']?.length || 0);
-                emptyState.hidden = points >= 2;
+            const hoverGuide = {
+                id: 'hoverGuide',
+                afterDatasetsDraw(chartInstance) {
+                    const active = chartInstance.tooltip?.getActiveElements();
+                    if (!active?.length) return;
+                    const { ctx, chartArea } = chartInstance;
+                    const x = active[0].element.x;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.setLineDash([2, 4]);
+                    ctx.strokeStyle = 'rgba(255,255,255,.5)';
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(x, chartArea.top);
+                    ctx.lineTo(x, chartArea.bottom);
+                    ctx.stroke();
+                    ctx.restore();
+                }
             };
 
             const canvas = document.getElementById('goldChart');
             if (canvas && window.Chart) {
                 chart = new Chart(canvas, {
                     type: 'line',
-                    data: { datasets: datasets(initialHistory) },
+                    data: { datasets: [dataset(initialHistory)] },
+                    plugins: [hoverGuide],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: { duration: 250 },
                         parsing: { xAxisKey: 'x', yAxisKey: 'y' },
-                        interaction: { mode: 'index', intersect: false },
+                        interaction: { mode: 'nearest', intersect: false, axis: 'x' },
+                        layout: { padding: { top: 8, right: 4 } },
                         scales: {
                             x: {
                                 type: 'category',
+                                border: { color: 'rgba(255,255,255,.16)' },
                                 grid: { display: false },
-                                title: { display: true, text: 'Observation date' },
                                 ticks: {
+                                    color: '#f0f2f4',
                                     autoSkip: true,
                                     maxRotation: 0,
-                                    maxTicksLimit: 8,
+                                    maxTicksLimit: 7,
+                                    padding: 10,
                                     callback: function(value) {
                                         return shortDate(this.getLabelForValue(value));
                                     }
                                 }
                             },
                             y: {
-                                title: { display: true, text: 'INR per gram' },
-                                ticks: { callback: value => '₹' + Number(value).toLocaleString('en-IN') }
+                                border: { display: false },
+                                grace: '8%',
+                                grid: { color: 'rgba(255,255,255,.14)' },
+                                ticks: {
+                                    color: '#f0f2f4',
+                                    padding: 10,
+                                    callback: value => axisMoney.format(Number(value))
+                                }
                             }
                         },
                         plugins: {
                             legend: { display: false },
                             tooltip: {
+                                displayColors: false,
+                                backgroundColor: '#202329',
+                                borderColor: 'rgba(255,255,255,.08)',
+                                borderWidth: 1,
+                                titleFont: { size: 0 },
+                                bodyColor: '#f7f7f7',
+                                bodyFont: { size: 15, weight: '600' },
+                                padding: 12,
                                 callbacks: {
-                                    title: items => items.length ? fullDate(items[0].label) : '',
-                                    label: context => context.dataset.label + ': ' + money.format(context.parsed.y)
+                                    title: () => '',
+                                    label: context => money.format(context.parsed.y) + '  ' + tooltipDate(context.raw.x)
                                 }
                             }
                         }
                     }
                 });
-                setEmptyState(initialHistory);
+                updateChart(initialHistory);
             }
-            updateDateRange(initialHistory);
 
             const updateEstimates = () => {
                 const grams = Number(slider?.value || 10);
@@ -292,9 +363,17 @@
                 );
             };
 
-            const refresh = async () => {
+            const setPressed = (buttons, active) => buttons.forEach(button => {
+                const selected = button.dataset.range === active || button.dataset.carat === active;
+                button.classList.toggle('active', selected);
+                button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            });
+
+            const refresh = async (animate = false) => {
                 try {
-                    const response = await fetch(endpoint, {
+                    const url = new URL(endpoint, window.location.origin);
+                    url.searchParams.set('range', state.range);
+                    const response = await fetch(url, {
                         headers: { 'Accept': 'application/json' },
                         cache: 'no-store'
                     });
@@ -304,6 +383,7 @@
                     updateRate('24K', payload.rates['24K']);
                     updateRate('22K', payload.rates['22K']);
                     updateEstimates();
+                    updateChart(payload.history, animate);
 
                     const rate24 = payload.rates['24K'];
                     if (rate24) {
@@ -313,13 +393,6 @@
                         document.getElementById('market-recommendation').textContent = change < -50
                             ? 'Favourable buying window'
                             : (change > 100 ? 'Consider watching the market' : 'Market is steady');
-                    }
-
-                    updateDateRange(payload.history);
-                    if (chart) {
-                        chart.data.datasets = datasets(payload.history);
-                        chart.update();
-                        setEmptyState(payload.history);
                     }
 
                     status.textContent = 'Latest check ' + new Date().toLocaleTimeString('en-IN') +
@@ -332,8 +405,21 @@
                 }
             };
 
+            rangeButtons.forEach(button => button.addEventListener('click', () => {
+                state.range = button.dataset.range;
+                setPressed(rangeButtons, state.range);
+                refresh(true);
+            }));
+            caratButtons.forEach(button => button.addEventListener('click', () => {
+                state.carat = button.dataset.carat;
+                setPressed(caratButtons, state.carat);
+                updateChart(state.history, true);
+            }));
+            setPressed(rangeButtons, state.range);
+            setPressed(caratButtons, state.carat);
+
             refresh();
-            window.setInterval(refresh, {{ $pollSeconds * 1000 }});
+            window.setInterval(() => refresh(false), {{ $pollSeconds * 1000 }});
         });
     </script>
 @endpush
