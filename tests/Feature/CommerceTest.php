@@ -26,6 +26,17 @@ class CommerceTest extends TestCase
         $this->get('/')->assertOk()->assertSee('Gold you can trust');
         $this->get('/gold')->assertOk()->assertSee('Find your gold');
         $this->get('/gold-prices')->assertOk()->assertSee('Gold prices, in perspective');
+        $this->getJson(route('gold-prices.data'))
+            ->assertOk()
+            ->assertJsonStructure([
+                'currency',
+                'unit',
+                'source',
+                'server_time',
+                'poll_after_seconds',
+                'rates' => ['22K', '24K'],
+                'history' => ['22K', '24K'],
+            ]);
         $this->get('/gold-loan-assistance')->assertOk()->assertSee('We connect. We do not lend');
     }
 

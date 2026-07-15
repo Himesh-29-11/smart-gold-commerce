@@ -106,12 +106,14 @@ Expected normalized response (paths are configurable):
 }
 ```
 
-Configuration:
+Provider-neutral configuration:
 
 ```dotenv
 GOLD_PRICE_PROVIDER=licensed_vendor_name
 GOLD_PRICE_API_URL=https://vendor.example/v1/gold/latest
+GOLD_PRICE_HISTORY_API_URL=https://vendor.example/v1/gold/history/{date}?currency={currency}
 GOLD_PRICE_API_KEY=secret
+GOLD_PRICE_API_AUTH_MODE=header
 GOLD_PRICE_API_KEY_HEADER=X-API-Key
 GOLD_PRICE_API_UNIT=gram
 GOLD_PRICE_22K_PATH=rates.22K
@@ -119,21 +121,36 @@ GOLD_PRICE_24K_PATH=rates.24K
 GOLD_PRICE_22K_CHANGE_PATH=changes.22K
 GOLD_PRICE_24K_CHANGE_PATH=changes.24K
 GOLD_PRICE_TIMESTAMP_PATH=timestamp
+GOLD_PRICE_HISTORY_22K_PATH=rates.22K
+GOLD_PRICE_HISTORY_24K_PATH=rates.24K
+GOLD_PRICE_HISTORY_TIMESTAMP_PATH=timestamp
+GOLD_PRICE_DASHBOARD_POLL_SECONDS=60
 ```
 
-For APIs quoted per troy ounce, set `GOLD_PRICE_API_UNIT=troy_ounce`; the adapter converts to grams. Test one synchronization:
+Authentication modes are `header`, `bearer`, `query`, and `none`. Never commit `GOLD_PRICE_API_KEY`; place it only in `.env` or a production secret manager. For APIs quoted per troy ounce, set `GOLD_PRICE_API_UNIT=troy_ounce`; the adapter converts to grams.
+
+Import genuine history and append the current observation:
 
 ```bash
+php artisan gold:backfill-prices --days=30
 php artisan gold:sync-prices
 ```
 
-The scheduler runs it hourly. In production, run one scheduler process:
+`GOLD_PRICE_HISTORY_API_URL` must contain `{date}`. Response paths can be different for current and historical endpoints. The backfill command requests completed dates oldest-first and updates matching observations rather than creating duplicates.
+
+The scheduler obtains current rates every 15 minutes. The browser polls the local JSON endpoint every 60 seconds; it does not expose the provider key or call the vendor directly. On Windows development, keep this running in a separate terminal:
+
+```powershell
+php artisan schedule:work
+```
+
+On production Linux, run one scheduler process:
 
 ```cron
 * * * * * cd /var/www/smart-gold-commerce && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-The default `database` provider intentionally refuses remote synchronization and serves the latest cached/seeded record. The UI visibly shows the source and stale state.
+The graph filters to one active provider and one closing observation per day, so demo data is never joined to real data. If fewer than two genuine points exist, the dashboard shows a collection message instead of drawing a misleading line. The default `database` provider refuses remote synchronization and serves cached/demo records only.
 
 ## Payment configuration
 

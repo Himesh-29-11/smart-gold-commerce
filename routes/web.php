@@ -14,6 +14,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\GoldPriceController;
+use App\Http\Controllers\GoldPriceDataController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ReviewController;
@@ -24,6 +25,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/gold', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/gold/{product:slug}', [CatalogController::class, 'show'])->name('catalog.show');
 Route::get('/gold-prices', GoldPriceController::class)->name('gold-prices');
+Route::get('/gold-prices/data', GoldPriceDataController::class)->middleware('throttle:120,1')->name('gold-prices.data');
 Route::get('/gold-loan-assistance', [LoanController::class, 'index'])->name('loans.index');
 
 Route::middleware('guest')->group(function () {

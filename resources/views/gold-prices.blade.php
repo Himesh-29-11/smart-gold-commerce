@@ -4,96 +4,125 @@
     <section class="page-hero price-hero">
         <span class="kicker">Market intelligence</span>
         <h1>Gold prices, in perspective</h1>
-        <p>Authorized rate feeds, historical movement and a clear timestamp—never a manually copied price.</p>
+        <p>Authorized rates, genuine historical movement and a clear timestamp—never a manually copied price.</p>
     </section>
-    <section class="section rates-wrap">
 
-        <div class="location-selector"
-            style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
-            <label for="citySelect" style="font-weight: 600; font-size: 0.9rem; color: #555;">Select Location:</label>
-            <select id="citySelect"
-                style="padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 6px; font-size: 0.95rem; background: #fff; cursor: pointer; min-width: 200px;">
-                <option value="0">National Average (IBJA)</option>
-                <option value="-61.91">Ahmedabad</option>
-                <option value="45.50">Mumbai</option>
-                <option value="55.00">Delhi</option>
-                <option value="85.20">Chennai</option>
-            </select>
+    <section class="section rates-wrap">
+        <div class="live-rate-bar" role="status">
+            <span class="live-rate-dot"></span>
+            <strong>Authorized market feed</strong>
+            <span id="dashboard-status">Checking for updates…</span>
         </div>
 
         <div class="rate-cards">
             @foreach ($rates as $carat => $rate)
                 <article>
-                    <div><span>{{ $carat }} GOLD</span><small>Price per gram · INR</small></div><strong
-                        class="display-price" id="display-price-{{ $carat }}"
-                        data-base-price="{{ $rate ? $rate->price_per_gram : 0 }}">{{ $rate ? '₹' . number_format($rate->price_per_gram, 2) : 'Unavailable' }}</strong>
-                    @if ($rate)
-                        <p class="{{ $rate->market_change >= 0 ? 'up' : 'down' }}">{{ $rate->market_change >= 0 ? '▲' : '▼' }}
-                            ₹{{ number_format(abs($rate->market_change), 2) }} today</p>
-                        <footer>Updated {{ $rate->fetched_at->format('d M Y, h:i A') }} IST<br>Source: {{ $rate->source }}
-                        </footer>
-                    @endif
+                    <div>
+                        <span>{{ $carat }} GOLD</span>
+                        <small>Price per gram · INR</small>
+                    </div>
+                    <strong class="display-price" id="display-price-{{ $carat }}"
+                        data-base-price="{{ $rate ? $rate->price_per_gram : 0 }}">
+                        {{ $rate ? '₹' . number_format($rate->price_per_gram, 2) : 'Unavailable' }}
+                    </strong>
+                    <p id="rate-change-{{ $carat }}" class="{{ ($rate?->market_change ?? 0) >= 0 ? 'up' : 'down' }}">
+                        @if ($rate)
+                            {{ $rate->market_change >= 0 ? '▲' : '▼' }}
+                            ₹{{ number_format(abs($rate->market_change), 2) }} today
+                        @else
+                            Awaiting authorized rate
+                        @endif
+                    </p>
+                    <footer id="rate-meta-{{ $carat }}">
+                        @if ($rate)
+                            Updated {{ $rate->fetched_at->format('d M Y, h:i A') }} IST<br>
+                            Source: {{ $rate->source }}
+                        @else
+                            No authorized observation stored
+                        @endif
+                    </footer>
                 </article>
             @endforeach
         </div>
+
         <div class="calculator-panel"
             style="margin-top:2rem; padding:1.5rem; background:rgba(0,0,0,0.03); border-radius:12px; margin-bottom:2rem;">
             <h3 style="margin-top:0; font-size:1.1rem;">Estimate Value by Weight</h3>
+            <p class="muted">Uses the latest stored authorized national rate. Retail premiums, making charges and tax are not included.</p>
             <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1.5rem;">
                 <input type="range" id="gramSlider" min="1" max="100" value="10"
                     style="flex:1; accent-color:#b8862f; cursor:pointer;">
-                <span style="font-weight:600; font-size:1.25rem; min-width:3rem; text-align:right;"><span
-                        id="gramValue">10</span>g</span>
+                <span style="font-weight:600; font-size:1.25rem; min-width:3rem; text-align:right;">
+                    <span id="gramValue">10</span>g
+                </span>
             </div>
             <div style="display:flex; gap:1rem; flex-wrap:wrap;">
                 @foreach ($rates as $carat => $rate)
-                    @if ($rate)
-                        <div
-                            style="flex:1; min-width:200px; padding:1.25rem; background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                            <span
-                                style="display:block; font-size:0.85rem; color:#666; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">{{ $carat }}
-                                Est. Value</span>
-                            <strong style="font-size:1.5rem; color:#111;" class="calculated-est"
-                                id="est-{{ $carat }}"
-                                data-price="{{ $rate->price_per_gram }}">₹{{ number_format($rate->price_per_gram * 10, 2) }}</strong>
-                        </div>
-                    @endif
+                    <div
+                        style="flex:1; min-width:200px; padding:1.25rem; background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                        <span
+                            style="display:block; font-size:0.85rem; color:#666; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">
+                            {{ $carat }} Est. Value
+                        </span>
+                        <strong style="font-size:1.5rem; color:#111;" class="calculated-est"
+                            id="est-{{ $carat }}" data-price="{{ $rate?->price_per_gram ?? 0 }}">
+                            {{ $rate ? '₹' . number_format($rate->price_per_gram * 10, 2) : 'Unavailable' }}
+                        </strong>
+                    </div>
                 @endforeach
             </div>
         </div>
+
         <div class="market-layout">
             <article class="chart-panel">
                 <div class="section-heading">
-                    <div><span class="kicker dark">30-day movement</span>
-                        <h2>Price history</h2>
+                    <div>
+                        <span class="kicker dark">30-day movement</span>
+                        <h2>Real price history</h2>
                     </div>
-                    <div class="chart-legend"><span class="dot dot-24"></span>24K <span class="dot dot-22"></span>22K</div>
+                    <div class="chart-legend">
+                        <span class="dot dot-24"></span>24K
+                        <span class="dot dot-22"></span>22K
+                    </div>
                 </div>
-                <div class="chart-box"><canvas id="goldChart" aria-label="Gold price history graph"></canvas></div>
+                <div class="chart-box">
+                    <canvas id="goldChart" aria-label="Authorized gold price history graph"></canvas>
+                    <div id="chart-empty" class="chart-empty" hidden>
+                        <strong>Genuine history is being collected</strong>
+                        <span>Backfill an authorized historical feed or keep the scheduler running to build the graph.</span>
+                    </div>
+                </div>
             </article>
-            <aside class="recommendation"><span>MARKET SIGNAL</span>
-                <h2>{{ $recommendation }}</h2>
-                <p>This rule-based indicator uses only the latest daily movement. It is educational information, not
-                    financial advice.</p>
+
+            <aside class="recommendation">
+                <span>MARKET SIGNAL</span>
+                <h2 id="market-recommendation">{{ $recommendation }}</h2>
+                <p>This rule-based indicator uses only the latest authorized daily movement. It is educational information,
+                    not financial advice.</p>
                 <dl>
                     <div>
                         <dt>Trend</dt>
-                        <dd>{{ ($rates['24K']?->market_change ?? 0) >= 0 ? 'Positive' : 'Negative' }}</dd>
+                        <dd id="market-trend">{{ ($rates['24K']?->market_change ?? 0) >= 0 ? 'Positive' : 'Negative' }}</dd>
                     </div>
                     <div>
                         <dt>Data freshness</dt>
-                        <dd>{{ $service->isStale($rates['24K']) ? 'Stale' : 'Current' }}</dd>
+                        <dd id="market-freshness">{{ $service->isStale($rates['24K']) ? 'Stale' : 'Current' }}</dd>
                     </div>
-                </dl><a class="button full" href="{{ route('catalog.index') }}">Browse gold</a>
+                </dl>
+                <a class="button full" href="{{ route('catalog.index') }}">Browse gold</a>
             </aside>
         </div>
-        <div class="source-disclaimer"><b>ⓘ Data integrity notice</b>
-            <p>Live production rates must come from a licensed market-data vendor or an approved partner API. Seeded records
-                show “demo-seed-not-live” and must never be represented as a live quote. Product checkout recalculates the
-                value from the latest stored authorized rate.</p>
+
+        <div class="source-disclaimer">
+            <b>ⓘ Data integrity notice</b>
+            <p>The graph uses one observation per day from a single active source. Demo rows are never mixed with real
+                provider rows. The browser checks this Laravel endpoint every {{ $pollSeconds }} seconds, while the scheduler
+                obtains new authorized rates every 15 minutes.</p>
         </div>
     </section>
-    <section class="section section-tint"><span class="kicker dark">Market briefing</span>
+
+    <section class="section section-tint">
+        <span class="kicker dark">Market briefing</span>
         <h2>What can move gold prices?</h2>
         <div class="news-grid">
             <article><span>Currency</span>
@@ -111,131 +140,153 @@
         </div>
     </section>
 @endsection
+
 @push('scripts')
     <script>
         window.addEventListener('load', () => {
-            const canvas = document.getElementById('goldChart');
-            if (!canvas || !window.Chart) return;
-            const history = @json($history->map(fn($rows) => $rows->map(fn($r) => ['x' => $r->fetched_at->format('Y-m-d'), 'y' => (float) $r->price_per_gram])->values()));
-            new Chart(canvas, {
-                type: 'line',
-                data: {
-                    datasets: [{
-                        label: '24K',
-                        data: history['24K'] || [],
-                        borderColor: '#b8862f',
-                        backgroundColor: 'rgba(184,134,47,.1)',
-                        tension: .35,
-                        fill: true,
-                        pointRadius: 0
-                    }, {
-                        label: '22K',
-                        data: history['22K'] || [],
-                        borderColor: '#173c34',
-                        backgroundColor: 'transparent',
-                        tension: .35,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    parsing: {
-                        xAxisKey: 'x',
-                        yAxisKey: 'y'
-                    },
-                    scales: {
-                        x: {
-                            type: 'category',
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                maxTicksLimit: 6
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                callback: v => '₹' + Number(v).toLocaleString('en-IN')
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: c => c.dataset.label + ': ₹' + Number(c.parsed.y).toLocaleString(
-                                    'en-IN')
-                            }
-                        }
-                    }
-                }
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
+            const endpoint = @json(route('gold-prices.data'));
+            const initialHistory = @json($history->map(fn($rows) => $rows->map(fn($row) => ['x' => $row->fetched_at->format('Y-m-d'), 'y' => (float) $row->price_per_gram])->values()));
             const slider = document.getElementById('gramSlider');
             const gramValue = document.getElementById('gramValue');
-            const estElements = document.querySelectorAll('.calculated-est');
-            const citySelect = document.getElementById('citySelect');
-            const displayPrices = {
-                '24K': document.getElementById('display-price-24K'),
-                '22K': document.getElementById('display-price-22K')
+            const status = document.getElementById('dashboard-status');
+            const emptyState = document.getElementById('chart-empty');
+            const money = new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            let chart;
+
+            const datasets = history => [{
+                label: '24K',
+                data: history['24K'] || [],
+                borderColor: '#b8862f',
+                backgroundColor: 'rgba(184,134,47,.1)',
+                tension: .35,
+                fill: true,
+                pointRadius: 2
+            }, {
+                label: '22K',
+                data: history['22K'] || [],
+                borderColor: '#173c34',
+                backgroundColor: 'transparent',
+                tension: .35,
+                pointRadius: 2
+            }];
+
+            const setEmptyState = history => {
+                const points = Math.max(history['24K']?.length || 0, history['22K']?.length || 0);
+                emptyState.hidden = points >= 2;
             };
 
-            function updatePrices() {
-                const premium = parseFloat(citySelect.value) || 0;
-
-                // Update main rate cards
-                Object.keys(displayPrices).forEach(carat => {
-                    const el = displayPrices[carat];
-                    if (el) {
-                        const basePrice = parseFloat(el.getAttribute('data-base-price'));
-                        if (basePrice > 0) {
-                            // 22K premium is proportionally adjusted
-                            const adjustedPremium = carat === '22K' ? premium * 0.916 : premium;
-                            const newPrice = basePrice + adjustedPremium;
-                            el.textContent = '₹' + newPrice.toLocaleString('en-IN', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-
-                            // Update data-price on estimator so slider uses the regional price
-                            const estEl = document.getElementById('est-' + carat);
-                            if (estEl) {
-                                estEl.setAttribute('data-price', newPrice);
+            const canvas = document.getElementById('goldChart');
+            if (canvas && window.Chart) {
+                chart = new Chart(canvas, {
+                    type: 'line',
+                    data: { datasets: datasets(initialHistory) },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+                        scales: {
+                            x: { type: 'category', grid: { display: false }, ticks: { maxTicksLimit: 6 } },
+                            y: { ticks: { callback: value => '₹' + Number(value).toLocaleString('en-IN') } }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: context => context.dataset.label + ': ' + money.format(context.parsed.y)
+                                }
                             }
                         }
                     }
                 });
-
-                // Re-trigger slider calculation
-                if (slider) {
-                    slider.dispatchEvent(new Event('input'));
-                }
+                setEmptyState(initialHistory);
             }
 
-            if (citySelect) {
-                citySelect.addEventListener('change', updatePrices);
-            }
-
-            if (slider && gramValue && estElements.length > 0) {
-                slider.addEventListener('input', (e) => {
-                    const grams = e.target.value;
-                    gramValue.textContent = grams;
-
-                    estElements.forEach(el => {
-                        const pricePerGram = parseFloat(el.getAttribute('data-price'));
-                        const total = pricePerGram * grams;
-                        el.textContent = '₹' + total.toLocaleString('en-IN', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        });
-                    });
+            const updateEstimates = () => {
+                const grams = Number(slider?.value || 10);
+                if (gramValue) gramValue.textContent = grams;
+                document.querySelectorAll('.calculated-est').forEach(element => {
+                    const price = Number(element.dataset.price || 0);
+                    element.textContent = price > 0 ? money.format(price * grams) : 'Unavailable';
                 });
-            }
+            };
+
+            slider?.addEventListener('input', updateEstimates);
+            updateEstimates();
+
+            const updateRate = (carat, rate) => {
+                const priceElement = document.getElementById('display-price-' + carat);
+                const estimateElement = document.getElementById('est-' + carat);
+                const changeElement = document.getElementById('rate-change-' + carat);
+                const metaElement = document.getElementById('rate-meta-' + carat);
+                if (!priceElement || !estimateElement || !changeElement || !metaElement) return;
+
+                if (!rate) {
+                    priceElement.textContent = 'Unavailable';
+                    estimateElement.dataset.price = '0';
+                    changeElement.textContent = 'Awaiting authorized rate';
+                    metaElement.textContent = 'No authorized observation stored';
+                    return;
+                }
+
+                priceElement.textContent = money.format(rate.price_per_gram);
+                priceElement.dataset.basePrice = rate.price_per_gram;
+                estimateElement.dataset.price = rate.price_per_gram;
+                const positive = rate.market_change >= 0;
+                changeElement.className = positive ? 'up' : 'down';
+                changeElement.textContent = (positive ? '▲ ' : '▼ ') + money.format(Math.abs(rate.market_change)) + ' today';
+                metaElement.replaceChildren(
+                    document.createTextNode('Updated ' + rate.fetched_at_display + ' IST'),
+                    document.createElement('br'),
+                    document.createTextNode('Source: ' + rate.source)
+                );
+            };
+
+            const refresh = async () => {
+                try {
+                    const response = await fetch(endpoint, {
+                        headers: { 'Accept': 'application/json' },
+                        cache: 'no-store'
+                    });
+                    if (!response.ok) throw new Error('Rate endpoint returned ' + response.status);
+                    const payload = await response.json();
+
+                    updateRate('24K', payload.rates['24K']);
+                    updateRate('22K', payload.rates['22K']);
+                    updateEstimates();
+
+                    const rate24 = payload.rates['24K'];
+                    if (rate24) {
+                        const change = Number(rate24.market_change);
+                        document.getElementById('market-trend').textContent = change >= 0 ? 'Positive' : 'Negative';
+                        document.getElementById('market-freshness').textContent = rate24.stale ? 'Stale' : 'Current';
+                        document.getElementById('market-recommendation').textContent = change < -50
+                            ? 'Favourable buying window'
+                            : (change > 100 ? 'Consider watching the market' : 'Market is steady');
+                    }
+
+                    if (chart) {
+                        chart.data.datasets = datasets(payload.history);
+                        chart.update();
+                        setEmptyState(payload.history);
+                    }
+
+                    status.textContent = 'Latest check ' + new Date().toLocaleTimeString('en-IN') +
+                        ' · Source: ' + (payload.source || 'not configured');
+                    status.closest('.live-rate-bar')?.classList.remove('has-error');
+                } catch (error) {
+                    status.textContent = 'Update check failed; showing the last verified stored rate.';
+                    status.closest('.live-rate-bar')?.classList.add('has-error');
+                    console.error(error);
+                }
+            };
+
+            refresh();
+            window.setInterval(refresh, {{ $pollSeconds * 1000 }});
         });
     </script>
 @endpush
