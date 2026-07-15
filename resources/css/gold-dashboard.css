@@ -1,0 +1,441 @@
+/* Gold price dashboard
+   Loaded after app.css so dashboard components are isolated from legacy chart rules. */
+
+.live-rate-bar {
+    align-items: center;
+    background: #eef5f1;
+    border: 1px solid #d7e6de;
+    color: #315247;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: .78rem;
+    gap: .55rem;
+    margin-bottom: 1.25rem;
+    padding: .75rem 1rem;
+}
+
+.live-rate-bar.has-error {
+    background: #fff3e8;
+    border-color: #efd1ae;
+    color: #814e1b;
+}
+
+.live-rate-dot {
+    animation: live-rate-pulse 1.8s infinite;
+    background: #2e8061;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    height: .55rem;
+    width: .55rem;
+}
+
+.market-summary-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-bottom: 1.25rem;
+}
+
+.market-metric-card {
+    background: #fff;
+    border: 1px solid #dfe3df;
+    box-shadow: 0 10px 30px rgba(18, 42, 35, .06);
+    display: flex;
+    flex-direction: column;
+    min-height: 12.5rem;
+    min-width: 0;
+    padding: 1.25rem;
+}
+
+.market-metric-card::before {
+    background: var(--gold);
+    content: '';
+    display: block;
+    height: 3px;
+    margin: -1.25rem -1.25rem 1rem;
+}
+
+.metric-card-heading {
+    align-items: flex-start;
+    display: flex;
+    gap: .75rem;
+    justify-content: space-between;
+}
+
+.metric-card-heading span,
+.metric-label {
+    color: var(--gold);
+    font-size: .65rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.metric-card-heading small {
+    color: var(--muted);
+    font-size: .65rem;
+    text-align: right;
+}
+
+.rate-metric-card > strong {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: clamp(1.65rem, 2.4vw, 2.35rem);
+    line-height: 1.1;
+    margin-top: 1rem;
+    overflow-wrap: anywhere;
+}
+
+.rate-metric-card > p {
+    font-size: .72rem;
+    font-weight: 700;
+    margin: .55rem 0;
+}
+
+.rate-metric-card > footer {
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: .65rem;
+    margin-top: auto;
+    padding-top: .75rem;
+}
+
+.signal-metric-card > strong,
+.feed-metric-card > strong {
+    color: var(--green);
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    line-height: 1.2;
+    margin-top: .8rem;
+}
+
+.signal-metric-card > p,
+.feed-metric-card > p {
+    color: var(--muted);
+    font-size: .72rem;
+    margin: .6rem 0;
+}
+
+.metric-pair {
+    align-items: center;
+    border-top: 1px solid var(--line);
+    display: flex;
+    font-size: .72rem;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: .7rem;
+}
+
+.feed-metric-card > a {
+    color: var(--green);
+    font-size: .72rem;
+    font-weight: 800;
+    margin-top: auto;
+}
+
+.trend-chart-panel {
+    background: #22252b;
+    border: 0;
+    box-shadow: 0 18px 50px rgba(13, 16, 20, .18);
+    color: #f4f5f6;
+    margin-top: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+}
+
+.trend-chart-heading {
+    align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 1.6rem 1rem;
+}
+
+.trend-chart-heading .kicker {
+    color: #ff938a;
+    margin-bottom: .35rem;
+}
+
+.trend-chart-heading h2 {
+    color: #fff;
+    font-size: 1.65rem;
+    margin: 0;
+}
+
+.trend-chart-heading small {
+    color: #aeb4bc;
+}
+
+.carat-switch {
+    background: #191b20;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 999px;
+    display: flex;
+    padding: .2rem;
+}
+
+.carat-switch button,
+.range-tabs button {
+    background: transparent;
+    border: 0;
+    color: #b9c0c9;
+    cursor: pointer;
+    font: inherit;
+}
+
+.carat-switch button {
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+    padding: .38rem .7rem;
+}
+
+.carat-switch button.active {
+    background: #ff867c;
+    color: #1e2025;
+}
+
+.carat-switch button[data-carat="22K"].active {
+    background: #71c7ad;
+}
+
+.range-tabs {
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: .55rem 1.25rem;
+}
+
+.range-tabs button {
+    border-radius: 999px;
+    font-size: .82rem;
+    justify-self: center;
+    min-width: 3rem;
+    padding: .38rem .8rem;
+    transition: background .2s ease, color .2s ease;
+}
+
+.range-tabs button:hover,
+.range-tabs button.active {
+    background: #41464d;
+    color: #fff;
+}
+
+.trend-chart-stage {
+    height: clamp(22rem, 42vw, 32rem);
+    min-height: 22rem;
+    overflow: hidden;
+    padding: 1rem 1.25rem .35rem;
+    position: relative;
+    width: 100%;
+}
+
+.trend-chart-stage canvas {
+    display: block !important;
+    height: 100% !important;
+    max-height: none !important;
+    max-width: none !important;
+    position: relative;
+    visibility: visible !important;
+    width: 100% !important;
+    z-index: 1;
+}
+
+.chart-empty {
+    align-items: center;
+    background: rgba(34, 37, 43, .94);
+    color: #adb4bc;
+    display: flex;
+    flex-direction: column;
+    inset: 0;
+    justify-content: center;
+    padding: 2rem;
+    position: absolute;
+    text-align: center;
+    z-index: 2;
+}
+
+.chart-empty[hidden] {
+    display: none;
+}
+
+.chart-empty strong {
+    color: #fff;
+    font-family: var(--serif);
+    font-size: 1.35rem;
+}
+
+.chart-empty span {
+    color: #adb4bc;
+    margin-top: .4rem;
+    max-width: 30rem;
+}
+
+.trend-chart-footer {
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    color: #9fa6af;
+    display: flex;
+    font-size: .7rem;
+    justify-content: space-between;
+    padding: .75rem 1.5rem;
+    text-transform: uppercase;
+}
+
+.dashboard-support-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1.55fr) minmax(16rem, .75fr);
+    margin-top: 1.25rem;
+}
+
+.weight-calculator-card,
+.dashboard-context-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 1.4rem;
+}
+
+.support-card-heading {
+    align-items: flex-start;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.support-card-heading h3,
+.dashboard-context-card h3 {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    margin: .25rem 0 0;
+}
+
+.support-card-heading > strong {
+    color: var(--green);
+    font-size: 1.25rem;
+}
+
+.weight-calculator-card > p,
+.dashboard-context-card li {
+    color: var(--muted);
+    font-size: .75rem;
+}
+
+.weight-calculator-card input[type="range"] {
+    accent-color: var(--gold);
+    margin: .5rem 0 1rem;
+    width: 100%;
+}
+
+.weight-estimates {
+    display: grid;
+    gap: .75rem;
+    grid-template-columns: 1fr 1fr;
+}
+
+.weight-estimates > div {
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: .8rem 1rem;
+}
+
+.weight-estimates span {
+    color: var(--gold);
+    font-size: .65rem;
+    font-weight: 800;
+}
+
+.weight-estimates strong {
+    color: var(--ink);
+    font-size: 1.05rem;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-context-card ul {
+    margin: 1rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.dashboard-context-card li + li {
+    margin-top: .55rem;
+}
+
+@keyframes live-rate-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(46, 128, 97, .25);
+    }
+
+    50% {
+        box-shadow: 0 0 0 .35rem rgba(46, 128, 97, 0);
+    }
+}
+
+@media (max-width: 1050px) {
+    .market-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .dashboard-support-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trend-chart-stage {
+        height: 25rem;
+        min-height: 25rem;
+        padding-left: .4rem;
+        padding-right: .75rem;
+    }
+}
+
+@media (max-width: 560px) {
+    .market-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .market-metric-card {
+        min-height: auto;
+    }
+
+    .trend-chart-heading {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.2rem;
+    }
+
+    .trend-chart-heading h2 {
+        font-size: 1.35rem;
+    }
+
+    .carat-switch {
+        align-self: flex-start;
+    }
+
+    .range-tabs button {
+        min-width: 2.7rem;
+        padding-left: .55rem;
+        padding-right: .55rem;
+    }
+
+    .trend-chart-stage {
+        height: 21rem;
+        min-height: 21rem;
+        padding: .6rem .35rem .15rem;
+    }
+
+    .trend-chart-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: .25rem;
+    }
+
+    .weight-estimates {
+        grid-template-columns: 1fr;
+    }
+}

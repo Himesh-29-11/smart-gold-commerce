@@ -1,5 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Live Gold Price Dashboard')
+@push('head')
+    @vite('resources/css/gold-dashboard.css')
+@endpush
 @section('content')
     <section class="page-hero price-hero">
         <span class="kicker">Market intelligence</span>
@@ -14,12 +17,12 @@
             <span id="dashboard-status">Checking for updates…</span>
         </div>
 
-        <div class="rate-cards">
+        <div class="market-summary-grid">
             @foreach ($rates as $carat => $rate)
-                <article>
-                    <div>
+                <article class="market-metric-card rate-metric-card">
+                    <div class="metric-card-heading">
                         <span>{{ $carat }} GOLD</span>
-                        <small>Price per gram · INR</small>
+                        <small>Per gram · INR</small>
                     </div>
                     <strong class="display-price" id="display-price-{{ $carat }}"
                         data-base-price="{{ $rate ? $rate->price_per_gram : 0 }}">
@@ -35,96 +38,100 @@
                     </p>
                     <footer id="rate-meta-{{ $carat }}">
                         @if ($rate)
-                            Updated {{ $rate->fetched_at->format('d M Y, h:i A') }} IST<br>
-                            Source: {{ $rate->source }}
+                            {{ $rate->fetched_at->format('d M Y, h:i A') }} IST<br>
+                            {{ $rate->source }}
                         @else
                             No authorized observation stored
                         @endif
                     </footer>
                 </article>
             @endforeach
-        </div>
 
-        <div class="calculator-panel"
-            style="margin-top:2rem; padding:1.5rem; background:rgba(0,0,0,0.03); border-radius:12px; margin-bottom:2rem;">
-            <h3 style="margin-top:0; font-size:1.1rem;">Estimate Value by Weight</h3>
-            <p class="muted">Uses the latest stored authorized national rate. Retail premiums, making charges and tax are not included.</p>
-            <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1.5rem;">
-                <input type="range" id="gramSlider" min="1" max="100" value="10"
-                    style="flex:1; accent-color:#b8862f; cursor:pointer;">
-                <span style="font-weight:600; font-size:1.25rem; min-width:3rem; text-align:right;">
-                    <span id="gramValue">10</span>g
-                </span>
-            </div>
-            <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-                @foreach ($rates as $carat => $rate)
-                    <div
-                        style="flex:1; min-width:200px; padding:1.25rem; background:#fff; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                        <span
-                            style="display:block; font-size:0.85rem; color:#666; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">
-                            {{ $carat }} Est. Value
-                        </span>
-                        <strong style="font-size:1.5rem; color:#111;" class="calculated-est"
-                            id="est-{{ $carat }}" data-price="{{ $rate?->price_per_gram ?? 0 }}">
-                            {{ $rate ? '₹' . number_format($rate->price_per_gram * 10, 2) : 'Unavailable' }}
-                        </strong>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="market-layout">
-            <article class="chart-panel trend-chart-panel">
-                <div class="trend-chart-heading">
-                    <div>
-                        <span class="kicker">Authorized market history</span>
-                        <h2>Gold price trend</h2>
-                        <small>INR per 10 grams</small>
-                    </div>
-                    <div class="carat-switch" aria-label="Select gold purity">
-                        <button class="active" type="button" data-carat="24K">24K</button>
-                        <button type="button" data-carat="22K">22K</button>
-                    </div>
-                </div>
-
-                <div class="range-tabs" aria-label="Select chart period">
-                    <button type="button" data-range="5d">5D</button>
-                    <button class="active" type="button" data-range="1m">1M</button>
-                    <button type="button" data-range="1y">1Y</button>
-                    <button type="button" data-range="max">Max</button>
-                </div>
-
-                <div class="chart-box trend-chart-box">
-                    <canvas id="goldChart" aria-label="Authorized gold price history graph"></canvas>
-                    <div id="chart-empty" class="chart-empty dark" hidden>
-                        <strong>Genuine history is being collected</strong>
-                        <span>Backfill an authorized historical feed or keep the scheduler running to build the graph.</span>
-                    </div>
-                </div>
-
-                <div class="trend-chart-footer">
-                    <span id="history-date-range">Last 30 calendar days</span>
-                    <span id="chart-series-label">24K · 10g</span>
+            <article class="market-metric-card signal-metric-card">
+                <span class="metric-label">Market signal</span>
+                <strong id="market-recommendation">{{ $recommendation }}</strong>
+                <p>This rule uses the latest authorized 24K movement and is not financial advice.</p>
+                <div class="metric-pair">
+                    <span>Trend</span>
+                    <b id="market-trend">{{ ($rates['24K']?->market_change ?? 0) >= 0 ? 'Positive' : 'Negative' }}</b>
                 </div>
             </article>
 
-            <aside class="recommendation">
-                <span>MARKET SIGNAL</span>
-                <h2 id="market-recommendation">{{ $recommendation }}</h2>
-                <p>This rule-based indicator uses only the latest authorized daily movement. It is educational information,
-                    not financial advice.</p>
-                <dl>
+            <article class="market-metric-card feed-metric-card">
+                <span class="metric-label">Data status</span>
+                <strong id="market-freshness">{{ $service->isStale($rates['24K']) ? 'Stale' : 'Current' }}</strong>
+                <p id="market-source">Source: {{ $service->activeSource() ?? 'Not configured' }}</p>
+                <a href="{{ route('catalog.index') }}">Browse certified gold →</a>
+            </article>
+        </div>
+
+        <article class="trend-chart-panel" id="live-trend-panel">
+            <div class="trend-chart-heading">
+                <div>
+                    <span class="kicker">Authorized market history</span>
+                    <h2>Gold price trend</h2>
+                    <small>INR per 10 grams · one verified observation per day</small>
+                </div>
+                <div class="carat-switch" aria-label="Select gold purity">
+                    <button class="active" type="button" data-carat="24K">24K</button>
+                    <button type="button" data-carat="22K">22K</button>
+                </div>
+            </div>
+
+            <div class="range-tabs" aria-label="Select chart period">
+                <button type="button" data-range="5d">5D</button>
+                <button class="active" type="button" data-range="1m">1M</button>
+                <button type="button" data-range="1y">1Y</button>
+                <button type="button" data-range="max">Max</button>
+            </div>
+
+            <div class="trend-chart-stage">
+                <canvas id="goldChart" aria-label="Authorized gold price history graph"></canvas>
+                <div id="chart-empty" class="chart-empty dark" hidden>
+                    <strong>Genuine history is being collected</strong>
+                    <span>Backfill an authorized historical feed or keep the scheduler running to build the graph.</span>
+                </div>
+            </div>
+
+            <div class="trend-chart-footer">
+                <span id="history-date-range">Last 30 calendar days</span>
+                <span id="chart-series-label">24K · 10g</span>
+            </div>
+        </article>
+
+        <div class="dashboard-support-grid">
+            <section class="weight-calculator-card">
+                <div class="support-card-heading">
                     <div>
-                        <dt>Trend</dt>
-                        <dd id="market-trend">{{ ($rates['24K']?->market_change ?? 0) >= 0 ? 'Positive' : 'Negative' }}</dd>
+                        <span class="metric-label">Weight estimator</span>
+                        <h3>Estimate market value</h3>
                     </div>
-                    <div>
-                        <dt>Data freshness</dt>
-                        <dd id="market-freshness">{{ $service->isStale($rates['24K']) ? 'Stale' : 'Current' }}</dd>
-                    </div>
-                </dl>
-                <a class="button full" href="{{ route('catalog.index') }}">Browse gold</a>
-            </aside>
+                    <strong><span id="gramValue">10</span>g</strong>
+                </div>
+                <p>Uses the latest stored national rate. Retail premium, making charges and tax are excluded.</p>
+                <input type="range" id="gramSlider" min="1" max="100" value="10">
+                <div class="weight-estimates">
+                    @foreach ($rates as $carat => $rate)
+                        <div>
+                            <span>{{ $carat }}</span>
+                            <strong class="calculated-est" id="est-{{ $carat }}"
+                                data-price="{{ $rate?->price_per_gram ?? 0 }}">
+                                {{ $rate ? '₹' . number_format($rate->price_per_gram * 10, 2) : 'Unavailable' }}
+                            </strong>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
+            <section class="dashboard-context-card">
+                <span class="metric-label">Reading the chart</span>
+                <h3>Clear, comparable movement</h3>
+                <ul>
+                    <li>Choose 5D, 1M, 1Y or Max.</li>
+                    <li>Switch between 24K and 22K without reloading.</li>
+                    <li>Hover or tap a point for its exact date and 10g price.</li>
+                </ul>
+            </section>
         </div>
 
         <div class="source-disclaimer">
@@ -210,19 +217,24 @@
             }));
             const lineColor = () => state.carat === '24K' ? '#ff867c' : '#71c7ad';
             const fillColor = () => state.carat === '24K' ? 'rgba(255,134,124,.14)' : 'rgba(113,199,173,.14)';
-            const dataset = history => ({
-                label: state.carat,
-                data: selectedPoints(history),
-                borderColor: lineColor(),
-                backgroundColor: fillColor(),
-                borderWidth: 2.5,
-                tension: .18,
-                fill: true,
-                pointRadius: 0,
-                pointHoverRadius: 5,
-                pointHoverBackgroundColor: lineColor(),
-                pointHoverBorderColor: lineColor()
-            });
+            const dataset = history => {
+                const points = selectedPoints(history);
+
+                return {
+                    label: state.carat,
+                    data: points,
+                    borderColor: lineColor(),
+                    backgroundColor: fillColor(),
+                    borderWidth: 2.5,
+                    tension: .18,
+                    fill: true,
+                    pointRadius: points.length === 1 ? 5 : 0,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: lineColor(),
+                    pointHoverBackgroundColor: lineColor(),
+                    pointHoverBorderColor: lineColor()
+                };
+            };
             const updateDateRange = history => {
                 const dates = selectedPoints(history).map(point => point.x).sort();
                 dateRange.textContent = dates.length
@@ -231,7 +243,7 @@
                 seriesLabel.textContent = state.carat + ' · 10g';
             };
             const setEmptyState = history => {
-                emptyState.hidden = selectedPoints(history).length >= 2;
+                emptyState.hidden = selectedPoints(history).length > 0;
             };
             const updateChart = (history, animate = false) => {
                 state.history = history;
@@ -321,6 +333,15 @@
                     }
                 });
                 updateChart(initialHistory);
+                window.requestAnimationFrame(() => chart.resize());
+                if ('ResizeObserver' in window) {
+                    new ResizeObserver(() => chart?.resize())
+                        .observe(document.getElementById('live-trend-panel'));
+                }
+            } else {
+                emptyState.hidden = false;
+                emptyState.querySelector('strong').textContent = 'Chart library could not be loaded';
+                emptyState.querySelector('span').textContent = 'Rebuild the Vite assets and refresh this page.';
             }
 
             const updateEstimates = () => {
@@ -382,6 +403,8 @@
 
                     updateRate('24K', payload.rates['24K']);
                     updateRate('22K', payload.rates['22K']);
+                    document.getElementById('market-source').textContent = 'Source: ' +
+                        (payload.source || 'Not configured');
                     updateEstimates();
                     updateChart(payload.history, animate);
 

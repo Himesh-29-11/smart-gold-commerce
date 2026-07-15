@@ -29,6 +29,8 @@ class CommerceTest extends TestCase
             ->assertOk()
             ->assertSee('Gold prices, in perspective')
             ->assertSee('Gold price trend')
+            ->assertSee('market-summary-grid', escape: false)
+            ->assertSee('trend-chart-stage', escape: false)
             ->assertSee('data-range="1m"', escape: false)
             ->assertSee('INR per 10 grams');
         $this->getJson(route('gold-prices.data', ['range' => '5d']))
