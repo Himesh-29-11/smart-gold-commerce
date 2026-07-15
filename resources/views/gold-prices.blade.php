@@ -80,9 +80,12 @@
                         <span class="kicker dark">30-day movement</span>
                         <h2>Real price history</h2>
                     </div>
-                    <div class="chart-legend">
-                        <span class="dot dot-24"></span>24K
-                        <span class="dot dot-22"></span>22K
+                    <div class="chart-header-meta">
+                        <span id="history-date-range" class="history-date-range">Last 30 calendar days</span>
+                        <div class="chart-legend">
+                            <span class="dot dot-24"></span>24K
+                            <span class="dot dot-22"></span>22K
+                        </div>
                     </div>
                 </div>
                 <div class="chart-box">
@@ -150,6 +153,7 @@
             const gramValue = document.getElementById('gramValue');
             const status = document.getElementById('dashboard-status');
             const emptyState = document.getElementById('chart-empty');
+            const dateRange = document.getElementById('history-date-range');
             const money = new Intl.NumberFormat('en-IN', {
                 style: 'currency',
                 currency: 'INR',
@@ -157,6 +161,30 @@
                 maximumFractionDigits: 2
             });
             let chart;
+
+            const parseHistoryDate = value => {
+                const [year, month, day] = String(value).split('-').map(Number);
+                return new Date(year, month - 1, day);
+            };
+            const shortDate = value => parseHistoryDate(value).toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short'
+            });
+            const fullDate = value => parseHistoryDate(value).toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+            const updateDateRange = history => {
+                const dates = [...new Set([
+                    ...(history['24K'] || []).map(point => point.x),
+                    ...(history['22K'] || []).map(point => point.x)
+                ])].sort();
+
+                dateRange.textContent = dates.length
+                    ? (dates.length === 1 ? fullDate(dates[0]) : shortDate(dates[0]) + ' – ' + fullDate(dates[dates.length - 1]))
+                    : 'No authorized dates available';
+            };
 
             const datasets = history => [{
                 label: '24K',
@@ -189,14 +217,31 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         parsing: { xAxisKey: 'x', yAxisKey: 'y' },
+                        interaction: { mode: 'index', intersect: false },
                         scales: {
-                            x: { type: 'category', grid: { display: false }, ticks: { maxTicksLimit: 6 } },
-                            y: { ticks: { callback: value => '₹' + Number(value).toLocaleString('en-IN') } }
+                            x: {
+                                type: 'category',
+                                grid: { display: false },
+                                title: { display: true, text: 'Observation date' },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 0,
+                                    maxTicksLimit: 8,
+                                    callback: function(value) {
+                                        return shortDate(this.getLabelForValue(value));
+                                    }
+                                }
+                            },
+                            y: {
+                                title: { display: true, text: 'INR per gram' },
+                                ticks: { callback: value => '₹' + Number(value).toLocaleString('en-IN') }
+                            }
                         },
                         plugins: {
                             legend: { display: false },
                             tooltip: {
                                 callbacks: {
+                                    title: items => items.length ? fullDate(items[0].label) : '',
                                     label: context => context.dataset.label + ': ' + money.format(context.parsed.y)
                                 }
                             }
@@ -205,6 +250,7 @@
                 });
                 setEmptyState(initialHistory);
             }
+            updateDateRange(initialHistory);
 
             const updateEstimates = () => {
                 const grams = Number(slider?.value || 10);
@@ -269,6 +315,7 @@
                             : (change > 100 ? 'Consider watching the market' : 'Market is steady');
                     }
 
+                    updateDateRange(payload.history);
                     if (chart) {
                         chart.data.datasets = datasets(payload.history);
                         chart.update();

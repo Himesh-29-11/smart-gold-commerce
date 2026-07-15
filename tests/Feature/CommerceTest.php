@@ -25,7 +25,11 @@ class CommerceTest extends TestCase
     {
         $this->get('/')->assertOk()->assertSee('Gold you can trust');
         $this->get('/gold')->assertOk()->assertSee('Find your gold');
-        $this->get('/gold-prices')->assertOk()->assertSee('Gold prices, in perspective');
+        $this->get('/gold-prices')
+            ->assertOk()
+            ->assertSee('Gold prices, in perspective')
+            ->assertSee('history-date-range', escape: false)
+            ->assertSee('Observation date');
         $this->getJson(route('gold-prices.data'))
             ->assertOk()
             ->assertJsonStructure([
