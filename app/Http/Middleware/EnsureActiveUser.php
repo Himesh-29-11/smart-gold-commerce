@@ -18,6 +18,6 @@ class EnsureActiveUser
             return redirect()->route('login')->withErrors(['email' => 'This account has been disabled.']);
         }
 
-return $next($request);
+        return $next($request);
     }
 }

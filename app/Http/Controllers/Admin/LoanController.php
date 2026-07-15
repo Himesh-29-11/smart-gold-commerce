@@ -18,7 +18,7 @@ class LoanController extends Controller
             $query->where('status', $request->status);
         }
 
-return view('admin.loans', ['loans' => $query->latest()->paginate(20)->withQueryString()]);
+        return view('admin.loans', ['loans' => $query->latest()->paginate(20)->withQueryString()]);
     }
 
     public function update(Request $request, LoanRequest $loan): RedirectResponse

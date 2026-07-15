@@ -79,7 +79,7 @@ class CommerceTest extends TestCase
         $this->actingAs($admin)->get(route('admin.products.index'))->assertOk()->assertSee('Control certification details');
         $this->actingAs($admin)->get(route('admin.products.create'))->assertOk()->assertSee('Gallery media JSON');
         $this->actingAs($admin)->get(route('admin.orders.index'))->assertOk()->assertSee('Manage operational status');
-        $this->actingAs($admin)->get(route('admin.loans.index'))->assertOk()->assertSee('N & H Trust is a connector');
+        $this->actingAs($admin)->get(route('admin.loans.index'))->assertOk()->assertSee('N & H Trust is a connector', escape: false);
         $this->actingAs($admin)->get(route('admin.customers.index'))->assertOk()->assertSee('Customers');
     }
 

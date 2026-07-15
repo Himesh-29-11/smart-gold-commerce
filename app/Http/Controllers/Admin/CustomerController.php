@@ -17,7 +17,7 @@ class CustomerController extends Controller
             $query->where(fn ($q) => $q->where('name', 'like', '%'.$request->q.'%')->orWhere('email', 'like', '%'.$request->q.'%'));
         }
 
-return view('admin.customers', ['customers' => $query->latest()->paginate(20)->withQueryString()]);
+        return view('admin.customers', ['customers' => $query->latest()->paginate(20)->withQueryString()]);
     }
 
     public function toggle(User $user): RedirectResponse

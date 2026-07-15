@@ -20,7 +20,7 @@ class ProductController extends Controller
             $query->where(fn ($q) => $q->where('name', 'like', '%'.$request->q.'%')->orWhere('sku', 'like', '%'.$request->q.'%'));
         }
 
-return view('admin.products.index', ['products' => $query->latest()->paginate(20)->withQueryString()]);
+        return view('admin.products.index', ['products' => $query->latest()->paginate(20)->withQueryString()]);
     }
 
     public function create(): View
@@ -71,6 +71,6 @@ return view('admin.products.index', ['products' => $query->latest()->paginate(20
             unset($data['gallery_json']);
         }
 
-return $data;
+        return $data;
     }
 }

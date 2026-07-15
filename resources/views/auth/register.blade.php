@@ -21,8 +21,7 @@
                         characters with uppercase, lowercase and a number.</small></label><label>Confirm password<input
                         type="password" name="password_confirmation" autocomplete="new-password" required></label><label
                     class="check"><input type="checkbox" name="terms" value="1" required> I accept the terms,
-                    privacy notice and risk disclosure.</label><button class="button button-lg full" type="submit">Create
-                    secure account</button></form>
+                    privacy notice and risk disclosure.</label><button class="button button-lg full" type="submit">Create secure account</button></form>
             <div class="auth-divider">Already registered?</div><a class="text-link center" href="{{ route('login') }}">Sign
                 in to your account →</a>
         </div>

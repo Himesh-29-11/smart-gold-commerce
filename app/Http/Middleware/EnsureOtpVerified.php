@@ -14,6 +14,6 @@ class EnsureOtpVerified
             return redirect()->route('otp.show')->with('status', 'Verify your account to continue.');
         }
 
-return $next($request);
+        return $next($request);
     }
 }

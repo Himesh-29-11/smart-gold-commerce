@@ -25,6 +25,6 @@ class WishlistController extends Controller
             $message = 'Saved to wishlist.';
         }
 
-return back()->with('success', $message);
+        return back()->with('success', $message);
     }
 }

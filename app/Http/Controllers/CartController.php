@@ -63,6 +63,6 @@ class CartController extends Controller
     {
         $service->cartFor($request->user())->update(['coupon_code' => null]);
 
-        return back()->with('success','Coupon removed.');
+        return back()->with('success', 'Coupon removed.');
     }
 }

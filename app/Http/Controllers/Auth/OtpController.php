@@ -16,7 +16,7 @@ class OtpController extends Controller
             return redirect()->route('account.dashboard');
         }
 
-return view('auth.verify-otp');
+        return view('auth.verify-otp');
     }
 
     public function verify(Request $request, OtpService $otp): RedirectResponse

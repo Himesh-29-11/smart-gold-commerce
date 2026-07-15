@@ -71,5 +71,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'otp', 'ad
     Route::patch('/loans/{loan}', [AdminLoanController::class, 'update'])->name('loans.update');
     Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
     Route::patch('/customers/{user}/toggle', [AdminCustomerController::class, 'toggle'])->name('customers.toggle');
-    Route::get('/reports/orders.csv',[AdminReportController::class, 'ordersCsv'])->name('reports.orders');
+    Route::get('/reports/orders.csv', [AdminReportController::class, 'ordersCsv'])->name('reports.orders');
 });

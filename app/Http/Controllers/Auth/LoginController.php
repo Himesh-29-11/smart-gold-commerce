@@ -34,7 +34,7 @@ class LoginController extends Controller
             return redirect()->route('otp.show');
         }
 
-return redirect()->intended($user->isAdmin() ? route('admin.dashboard') : route('account.dashboard'));
+        return redirect()->intended($user->isAdmin() ? route('admin.dashboard') : route('account.dashboard'));
     }
 
     public function destroy(Request $request): RedirectResponse
