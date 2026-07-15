@@ -58,17 +58,19 @@ class GoldPriceService
      * Return one genuine closing observation per day for the active source.
      * Demo rows and authorized-provider rows are never mixed in one graph.
      */
-    public function dailyHistory(int $days = 30): Collection
+    public function dailyHistory(?int $days = 30): Collection
     {
         $source = $this->activeSource();
         if (! $source) {
             return collect(['22K' => collect(), '24K' => collect()]);
         }
 
-        $rows = GoldPriceHistory::where('source', $source)
-            ->where('fetched_at', '>=', now()->subDays($days)->startOfDay())
-            ->oldest('fetched_at')
-            ->get();
+        $query = GoldPriceHistory::where('source', $source);
+        if ($days !== null) {
+            $query->where('fetched_at', '>=', now()->subDays(max(0, $days - 1))->startOfDay());
+        }
+
+        $rows = $query->oldest('fetched_at')->get();
 
         return collect(['22K', '24K'])->mapWithKeys(function (string $carat) use ($rows): array {
             $daily = $rows->where('carat', $carat)

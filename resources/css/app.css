@@ -3093,3 +3093,146 @@ input[type=range] {
         width: 100%;
     }
 }
+
+.trend-chart-panel {
+    background: #22252b;
+    border: 0;
+    color: #f4f5f6;
+    overflow: hidden;
+    padding: 0;
+}
+
+.trend-chart-heading {
+    align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 1.6rem 1rem;
+}
+
+.trend-chart-heading .kicker {
+    color: #ff938a;
+    margin-bottom: .35rem;
+}
+
+.trend-chart-heading h2 {
+    color: #fff;
+    font-size: 1.65rem;
+    margin: 0;
+}
+
+.trend-chart-heading small {
+    color: #aeb4bc;
+}
+
+.carat-switch {
+    background: #191b20;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 999px;
+    display: flex;
+    padding: .2rem;
+}
+
+.carat-switch button,
+.range-tabs button {
+    background: transparent;
+    border: 0;
+    color: #b9c0c9;
+    cursor: pointer;
+    font: inherit;
+}
+
+.carat-switch button {
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+    padding: .38rem .7rem;
+}
+
+.carat-switch button.active {
+    background: #ff867c;
+    color: #1e2025;
+}
+
+.carat-switch button[data-carat="22K"].active {
+    background: #71c7ad;
+}
+
+.range-tabs {
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: .55rem 1.25rem;
+}
+
+.range-tabs button {
+    border-radius: 999px;
+    font-size: .82rem;
+    justify-self: center;
+    min-width: 3rem;
+    padding: .38rem .8rem;
+    transition: background .2s ease, color .2s ease;
+}
+
+.range-tabs button:hover,
+.range-tabs button.active {
+    background: #41464d;
+    color: #fff;
+}
+
+.trend-chart-box {
+    height: 390px;
+    padding: 1rem 1rem .2rem;
+}
+
+.trend-chart-box canvas {
+    position: relative;
+    z-index: 1;
+}
+
+.trend-chart-footer {
+    border-top: 1px solid rgba(255,255,255,.08);
+    color: #9fa6af;
+    display: flex;
+    font-size: .7rem;
+    justify-content: space-between;
+    padding: .75rem 1.5rem;
+    text-transform: uppercase;
+}
+
+.chart-empty.dark {
+    background: rgba(34,37,43,.94);
+    color: #adb4bc;
+    z-index: 2;
+}
+
+.chart-empty.dark strong {
+    color: #fff;
+}
+
+.chart-empty.dark span {
+    color: #adb4bc;
+}
+
+@media (max-width: 640px) {
+    .trend-chart-heading {
+        gap: 1rem;
+        padding: 1.2rem;
+    }
+
+    .trend-chart-heading h2 {
+        font-size: 1.35rem;
+    }
+
+    .trend-chart-box {
+        height: 330px;
+        padding-left: .25rem;
+        padding-right: .65rem;
+    }
+
+    .range-tabs button {
+        min-width: 2.7rem;
+        padding-left: .55rem;
+        padding-right: .55rem;
+    }
+}

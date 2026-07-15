@@ -150,7 +150,7 @@ On production Linux, run one scheduler process:
 * * * * * cd /var/www/smart-gold-commerce && php artisan schedule:run >> /dev/null 2>&1
 ```
 
-The graph filters to one active provider and one closing observation per day, so demo data is never joined to real data. If fewer than two genuine points exist, the dashboard shows a collection message instead of drawing a misleading line. The default `database` provider refuses remote synchronization and serves cached/demo records only.
+The graph filters to one active provider and one closing observation per day, so demo data is never joined to real data. It offers `5D`, `1M`, `1Y`, and `Max` periods plus a 24K/22K switch. The chart uses the Indian market convention of INR per 10 grams; product cards continue to show INR per gram. Hovering a point shows its exact price and weekday/date. If fewer than two genuine points exist, the dashboard shows a collection message instead of drawing a misleading line. The default `database` provider refuses remote synchronization and serves cached/demo records only.
 
 ## Payment configuration
 
