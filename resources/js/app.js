@@ -1,5 +1,6 @@
 import './bootstrap';
 import '../css/gold-dashboard.css';
+import '../css/catalog.css';
 import Chart from 'chart.js/auto';
 
 window.Chart = Chart;

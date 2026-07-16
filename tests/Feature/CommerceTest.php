@@ -24,7 +24,12 @@ class CommerceTest extends TestCase
     public function test_public_commerce_pages_render(): void
     {
         $this->get('/')->assertOk()->assertSee('Gold you can trust');
-        $this->get('/gold')->assertOk()->assertSee('Find your gold');
+        $this->get('/gold')
+            ->assertOk()
+            ->assertSee('Find your gold')
+            ->assertSee('catalog-shell', escape: false)
+            ->assertSee('catalog-grid', escape: false)
+            ->assertSee('Show matching gold');
         $this->get('/gold-prices')
             ->assertOk()
             ->assertSee('Gold prices, in perspective')
@@ -48,6 +53,20 @@ class CommerceTest extends TestCase
                 'history' => ['22K', '24K'],
             ]);
         $this->get('/gold-loan-assistance')->assertOk()->assertSee('We connect. We do not lend');
+    }
+
+    public function test_catalog_filters_keep_the_shop_layout_and_results_consistent(): void
+    {
+        $this->get(route('catalog.index', ['purity' => '24K']))
+            ->assertOk()
+            ->assertSee('Purity: 24K')
+            ->assertSee('active-filter-list', escape: false)
+            ->assertDontSee('Aarohi 22K Gold Necklace');
+
+        $this->assertSame(
+            '/images/products/lakshmi_coin.png',
+            Product::where('sku', 'COIN-24K-1G')->firstOrFail()->image_url,
+        );
     }
 
     public function test_verified_customer_can_add_and_update_cart(): void
