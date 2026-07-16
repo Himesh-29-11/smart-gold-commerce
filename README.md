@@ -87,8 +87,8 @@ Open `http://127.0.0.1:8000`.
 
 | Role | Email | Password |
 |---|---|---|
-| Administrator | `admin@aurumtrust.test` | `Admin@12345` |
-| Customer | `customer@aurumtrust.test` | `Customer@123` |
+| Administrator | `admin@nhtrust.test` | `Admin@12345` |
+| Customer | `customer@nhtrust.test` | `Customer@123` |
 
 Both seeded accounts are pre-verified. **Delete or rotate them before any shared deployment.** New users receive an email OTP. With the default `MAIL_MAILER=log`, the OTP is written to `storage/logs/laravel.log` for local development.
 

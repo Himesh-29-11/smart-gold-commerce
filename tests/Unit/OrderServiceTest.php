@@ -24,7 +24,7 @@ class OrderServiceTest extends TestCase
 
     public function test_server_side_order_creation_snapshots_totals_and_reserves_stock(): void
     {
-        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $user = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $product = Product::where('purity', '24K')->firstOrFail();
         $startingStock = $product->stock_quantity;
         app(CartService::class)->add($user, $product, 2);
@@ -48,7 +48,7 @@ class OrderServiceTest extends TestCase
 
     public function test_coupon_reduces_taxable_value_before_gst(): void
     {
-        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $user = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $product = Product::where('sku', 'BAR-24K-10G')->firstOrFail();
         $carts = app(CartService::class);
         $carts->add($user, $product);
@@ -69,7 +69,7 @@ class OrderServiceTest extends TestCase
     public function test_demo_prices_block_checkout_unless_explicitly_allowed(): void
     {
         config(['gold.allow_demo_checkout' => false]);
-        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $user = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $product = Product::where('pricing_mode', 'live')->firstOrFail();
         app(CartService::class)->add($user, $product);
 
@@ -88,7 +88,7 @@ class OrderServiceTest extends TestCase
     {
         config(['gold.block_stale_checkout' => true, 'gold.stale_after_minutes' => 90]);
         GoldPriceHistory::query()->update(['fetched_at' => now()->subDay()]);
-        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $user = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $product = Product::where('pricing_mode', 'live')->firstOrFail();
         app(CartService::class)->add($user, $product);
 

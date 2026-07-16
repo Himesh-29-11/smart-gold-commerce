@@ -150,7 +150,7 @@
 <body><button class="print" onclick="window.print()">Print / save as PDF</button>
     <div class="invoice">
         <div class="top">
-            <div class="brand">AURUM<small>TRUST</small></div>
+            <div class="brand">N &amp; H<small>TRUST</small></div>
             <div class="right">
                 <h1>TAX INVOICE</h1><b>{{ $order->reference }}</b>
             </div>

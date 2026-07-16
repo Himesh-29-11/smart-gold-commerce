@@ -80,7 +80,7 @@ class CommerceTest extends TestCase
 
     public function test_verified_customer_can_add_and_update_cart(): void
     {
-        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $user = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $product = Product::firstOrFail();
 
         $this->actingAs($user)->post(route('cart.store', $product), ['quantity' => 2])->assertRedirect();
@@ -94,7 +94,7 @@ class CommerceTest extends TestCase
 
     public function test_customer_can_submit_a_consent_based_loan_request(): void
     {
-        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $user = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $partner = Partner::where('type', 'loan')->firstOrFail();
 
         $response = $this->actingAs($user)->post(route('loans.store'), [
@@ -116,8 +116,8 @@ class CommerceTest extends TestCase
     public function test_auth_product_and_admin_screens_render(): void
     {
         $product = Product::firstOrFail();
-        $customer = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
-        $admin = User::where('email', 'admin@aurumtrust.test')->firstOrFail();
+        $customer = User::where('email', 'customer@nhtrust.test')->firstOrFail();
+        $admin = User::where('email', 'admin@nhtrust.test')->firstOrFail();
 
         $this->get('/login')
             ->assertOk()
@@ -142,7 +142,7 @@ class CommerceTest extends TestCase
 
     public function test_customer_cannot_open_another_customers_order(): void
     {
-        $customer = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $customer = User::where('email', 'customer@nhtrust.test')->firstOrFail();
         $other = User::factory()->create(['otp_verified_at' => now(), 'email_verified_at' => now()]);
         $order = $other->orders()->create([
             'reference' => 'SGC-TEST-ORDER', 'status' => 'pending', 'payment_status' => 'unpaid',

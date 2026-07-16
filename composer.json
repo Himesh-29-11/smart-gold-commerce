@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "aurum-trust/smart-gold-commerce",
+    "name": "nh-trust/smart-gold-commerce",
     "type": "project",
     "description": "Secure gold commerce, financing assistance and live market dashboard built with Laravel 12.",
     "keywords": ["laravel", "gold", "commerce", "fintech"],
