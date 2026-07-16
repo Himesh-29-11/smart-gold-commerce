@@ -11,6 +11,15 @@ class DemoGoldPriceService
 {
     public const SOURCE = 'demo-seed-not-live';
 
+    public function isCurrent(): bool
+    {
+        $latest = GoldPriceHistory::where('source', self::SOURCE)
+            ->latest('fetched_at')
+            ->first();
+
+        return $latest?->fetched_at?->isToday() ?? false;
+    }
+
     /**
      * Rebuild deterministic demonstration history through the current local date.
      * These values are illustrative and must never be represented as live prices.

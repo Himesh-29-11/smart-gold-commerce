@@ -4,8 +4,8 @@ use Illuminate\Support\Facades\Schedule;
 
 if (config('gold.provider') === 'database') {
     if (app()->isLocal()) {
-        Schedule::command('gold:refresh-demo-history --days=365')
-            ->dailyAt('00:05')
+        Schedule::command('gold:refresh-demo-history --days=365 --if-stale')
+            ->hourly()
             ->withoutOverlapping();
     }
 } else {

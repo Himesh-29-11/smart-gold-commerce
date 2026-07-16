@@ -104,6 +104,8 @@ With `GOLD_PRICE_PROVIDER=database`, the application serves records labelled `de
 php artisan gold:refresh-demo-history --days=365
 ```
 
+Keep `php artisan schedule:work` running during local development. Laravel checks demo freshness hourly and rebuilds only after the calendar date changes, so tomorrow's date and each following day are added automatically. If the computer or scheduler was off, the first hourly check after restart catches up.
+
 The dashboard and JSON endpoint return `mode: demo`, `is_demo: true`, a disclaimer, coverage dates and a `through_today` flag. Demo records are never described as live or authorized. Checkout is blocked by default while demo prices are active. For local payment-flow testing only, set `GOLD_PRICE_ALLOW_DEMO_CHECKOUT=true` in `.env`.
 
 ### Licensed provider mode

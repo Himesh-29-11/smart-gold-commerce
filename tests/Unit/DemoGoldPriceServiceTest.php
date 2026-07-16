@@ -6,6 +6,7 @@ use App\Models\GoldPriceHistory;
 use App\Services\DemoGoldPriceService;
 use App\Services\GoldPriceService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Tests\TestCase;
 
 class DemoGoldPriceServiceTest extends TestCase
@@ -17,7 +18,10 @@ class DemoGoldPriceServiceTest extends TestCase
         $this->travelTo('2026-07-16 14:30:00');
         config(['gold.provider' => 'database']);
 
-        $count = app(DemoGoldPriceService::class)->refresh(365);
+        $service = app(DemoGoldPriceService::class);
+        $this->assertFalse($service->isCurrent());
+
+        $count = $service->refresh(365);
         $history = app(GoldPriceService::class)->dailyHistory(365);
         $latest = GoldPriceHistory::where('source', DemoGoldPriceService::SOURCE)
             ->latest('fetched_at')
@@ -26,8 +30,15 @@ class DemoGoldPriceServiceTest extends TestCase
         $this->assertSame(730, $count);
         $this->assertSame(DemoGoldPriceService::SOURCE, $latest->source);
         $this->assertTrue($latest->fetched_at->isToday());
+        $this->assertTrue($service->isCurrent());
         $this->assertCount(365, $history['24K']);
         $this->assertCount(365, $history['22K']);
         $this->assertSame('demo', app(GoldPriceService::class)->dataMode());
+
+        $this->assertSame(0, Artisan::call('gold:refresh-demo-history', [
+            '--days' => 365,
+            '--if-stale' => true,
+        ]));
+        $this->assertStringContainsString('already includes today', Artisan::output());
     }
 }

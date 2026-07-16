@@ -14,7 +14,7 @@ The project is being stabilized in stages. A stage is complete only when formatt
 - Clearly labelled deterministic demo history through the current date
 - Demo checkout blocked unless explicitly enabled for local testing
 - Real provider synchronization every 15 minutes
-- Local demo refresh scheduled daily
+- Local demo freshness checked hourly, adding the current date after midnight
 - No provider credentials exposed to the browser
 
 A licensed provider is still required for real market values. Demo values must never be marketed as live or tradable.
