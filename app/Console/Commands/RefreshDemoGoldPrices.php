@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Services\DemoGoldPriceService;
+use Illuminate\Console\Command;
+
+class RefreshDemoGoldPrices extends Command
+{
+    protected $signature = 'gold:refresh-demo-history {--days=365 : Calendar days ending today}';
+
+    protected $description = 'Rebuild explicitly labelled demonstration gold history through today';
+
+    public function handle(DemoGoldPriceService $service): int
+    {
+        try {
+            $count = $service->refresh((int) $this->option('days'));
+            $this->warn('DEMONSTRATION DATA ONLY — these records are not market quotes.');
+            $this->info("Stored {$count} labelled demo observations through ".now()->toDateString().'.');
+
+            return self::SUCCESS;
+        } catch (\Throwable $exception) {
+            $this->error($exception->getMessage());
+
+            return self::FAILURE;
+        }
+    }
+}

@@ -42,12 +42,21 @@ class CommerceTest extends TestCase
             ->assertOk()
             ->assertJsonPath('range', '5d')
             ->assertJsonPath('chart_unit_grams', 10)
+            ->assertJsonPath('mode', 'demo')
+            ->assertJsonPath('is_demo', true)
+            ->assertJsonPath('coverage.through_today', true)
             ->assertJsonCount(5, 'history.24K')
             ->assertJsonStructure([
                 'currency',
                 'unit',
+                'mode',
+                'is_demo',
+                'disclaimer',
                 'source',
                 'server_time',
+                'server_date',
+                'coverage' => ['from', 'to', 'through_today', 'points'],
+                'signal' => ['label', 'trend', 'change_percent'],
                 'poll_after_seconds',
                 'rates' => ['22K', '24K'],
                 'history' => ['22K', '24K'],

@@ -4,11 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Coupon;
-use App\Models\GoldPriceHistory;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use App\Services\DemoGoldPriceService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -31,15 +31,8 @@ class DatabaseSeeder extends Seeder
         $loan2 = Partner::updateOrCreate(['slug' => 'trustcredit-demo'], ['type' => 'loan', 'name' => 'TrustCredit Finance (Demo)', 'description' => 'Illustrative regulated-provider profile for comparison UI.', 'interest_rate_min' => 11.25, 'interest_rate_max' => 17.5, 'tenure_min_months' => 3, 'tenure_max_months' => 48, 'is_verified' => true, 'is_active' => true, 'meta' => ['processing_fee' => 'Up to 1.5%', 'disclaimer' => 'Terms subject to lender assessment']]);
         $loan3 = Partner::updateOrCreate(['slug' => 'easyemi-demo'], ['type' => 'loan', 'name' => 'EasyEMI Financial (Demo)', 'description' => 'Illustrative financing provider. No application is transmitted externally in local mode.', 'interest_rate_min' => 12.0, 'interest_rate_max' => 18.0, 'tenure_min_months' => 6, 'tenure_max_months' => 36, 'is_verified' => true, 'is_active' => true, 'meta' => ['processing_fee' => 'Up to 1%', 'disclaimer' => 'Terms subject to lender assessment']]);
 
-        if (GoldPriceHistory::count() === 0) {
-            for ($days = 45; $days >= 0; $days--) {
-                $date = $days === 0 ? now() : now()->subDays($days)->setTime(10, 0);
-                $wave = sin($days / 4) * 75 + (45 - $days) * 4;
-                $base = 10150 + $wave;
-                foreach (['24K' => 1, '22K' => 0.9167] as $carat => $factor) {
-                    GoldPriceHistory::create(['carat' => $carat, 'price_per_gram' => round($base * $factor, 2), 'currency' => 'INR', 'market_change' => round(cos($days / 3) * 42, 2), 'source' => 'demo-seed-not-live', 'fetched_at' => $date]);
-                }
-            }
+        if (! app()->isProduction() && config('gold.provider') === 'database') {
+            app(DemoGoldPriceService::class)->refresh(365);
         }
 
         $products = [

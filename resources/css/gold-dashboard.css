@@ -439,3 +439,20 @@
         grid-template-columns: 1fr;
     }
 }
+
+.live-rate-bar.is-demo {
+    background: #fff7df;
+    border-color: #ead79b;
+    color: #72561a;
+}
+
+.live-rate-bar.is-demo .live-rate-dot {
+    animation: none;
+    background: #c48b21;
+    box-shadow: 0 0 0 .25rem rgba(196, 139, 33, .12);
+}
+
+.source-disclaimer.demo-disclaimer {
+    background: #fff7df;
+    border-left-color: #c48b21;
+}

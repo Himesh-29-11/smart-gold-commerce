@@ -66,6 +66,24 @@ class OrderServiceTest extends TestCase
         );
     }
 
+    public function test_demo_prices_block_checkout_unless_explicitly_allowed(): void
+    {
+        config(['gold.allow_demo_checkout' => false]);
+        $user = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
+        $product = Product::where('pricing_mode', 'live')->firstOrFail();
+        app(CartService::class)->add($user, $product);
+
+        $this->expectException(ValidationException::class);
+        app(OrderService::class)->create($user, [
+            'full_name' => 'Demo Customer',
+            'phone' => '9876500002',
+            'address_line_1' => 'Test address',
+            'city' => 'Ahmedabad',
+            'state' => 'Gujarat',
+            'postal_code' => '380001',
+        ]);
+    }
+
     public function test_stale_live_rate_blocks_order_creation(): void
     {
         config(['gold.block_stale_checkout' => true, 'gold.stale_after_minutes' => 90]);

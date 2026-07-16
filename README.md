@@ -96,6 +96,18 @@ Both seeded accounts are pre-verified. **Delete or rotate them before any shared
 
 The app never scrapes a retailer or asks staff to type a “live” rate. `App\Services\GoldPriceService` reads a licensed endpoint configured by environment values and writes immutable observations to `gold_price_histories`.
 
+### Explicit demo mode when no provider exists
+
+With `GOLD_PRICE_PROVIDER=database`, the application serves records labelled `demo-seed-not-live`. Refresh a deterministic 365-day demonstration series through the current local date with:
+
+```bash
+php artisan gold:refresh-demo-history --days=365
+```
+
+The dashboard and JSON endpoint return `mode: demo`, `is_demo: true`, a disclaimer, coverage dates and a `through_today` flag. Demo records are never described as live or authorized. Checkout is blocked by default while demo prices are active. For local payment-flow testing only, set `GOLD_PRICE_ALLOW_DEMO_CHECKOUT=true` in `.env`.
+
+### Licensed provider mode
+
 Expected normalized response (paths are configurable):
 
 ```json

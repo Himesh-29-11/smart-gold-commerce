@@ -33,5 +33,6 @@ return [
     ],
     'stale_after_minutes' => (int) env('GOLD_PRICE_STALE_MINUTES', 30),
     'block_stale_checkout' => (bool) env('GOLD_PRICE_BLOCK_STALE_CHECKOUT', true),
+    'allow_demo_checkout' => (bool) env('GOLD_PRICE_ALLOW_DEMO_CHECKOUT', false),
     'dashboard_poll_seconds' => max(30, (int) env('GOLD_PRICE_DASHBOARD_POLL_SECONDS', 60)),
 ];

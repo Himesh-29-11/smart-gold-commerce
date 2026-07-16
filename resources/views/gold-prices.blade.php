@@ -1,16 +1,39 @@
 @extends('layouts.app')
 @section('title', 'Live Gold Price Dashboard')
+@php
+    $modeHeroCopy = match ($dataMode) {
+        'live' => 'Authorized rates, genuine historical movement and a clear timestamp—never a manually copied price.',
+        'demo' => 'A clearly labelled demonstration dashboard. Connect a licensed provider before treating any value as a market quote.',
+        default => 'No market observation is available yet. Configure and synchronize an authorized provider to begin.',
+    };
+    $feedLabel = match ($dataMode) {
+        'live' => 'Authorized market feed',
+        'demo' => 'Demonstration dataset',
+        default => 'Data unavailable',
+    };
+    $historyLabel = match ($dataMode) {
+        'live' => 'Authorized market history',
+        'demo' => 'Demonstration price history',
+        default => 'No price history',
+    };
+    $disclaimerTitle = $dataMode === 'demo' ? 'Demonstration data notice' : 'Data integrity notice';
+    $disclaimerCopy = match ($dataMode) {
+        'live' => "The graph uses one observation per day from the configured provider. The browser checks for stored updates every {$pollSeconds} seconds.",
+        'demo' => 'These generated values exist only to demonstrate the interface and algorithms. They are not live, tradable or suitable for customer pricing.',
+        default => 'No gold-price data is available. Configure a provider and run synchronization before enabling customer pricing.',
+    };
+@endphp
 @section('content')
     <section class="page-hero price-hero">
         <span class="kicker">Market intelligence</span>
         <h1>Gold prices, in perspective</h1>
-        <p>Authorized rates, genuine historical movement and a clear timestamp—never a manually copied price.</p>
+        <p>{{ $modeHeroCopy }}</p>
     </section>
 
     <section class="section rates-wrap">
-        <div class="live-rate-bar" role="status">
+        <div class="live-rate-bar {{ $dataMode === 'demo' ? 'is-demo' : '' }}" role="status">
             <span class="live-rate-dot"></span>
-            <strong>Authorized market feed</strong>
+            <strong id="feed-kind">{{ $feedLabel }}</strong>
             <span id="dashboard-status">Checking for updates…</span>
         </div>
 
@@ -50,12 +73,12 @@
                 <p>This rule uses the latest authorized 24K movement and is not financial advice.</p>
                 <div class="metric-pair">
                     <span>Trend</span>
-                    <b id="market-trend">{{ ($rates['24K']?->market_change ?? 0) >= 0 ? 'Positive' : 'Negative' }}</b>
+                    <b id="market-trend">{{ $marketTrend }}</b>
                 </div>
             </article>
 
             <article class="market-metric-card feed-metric-card">
-                <span class="metric-label">Data status</span>
+                <span class="metric-label">{{ $dataMode === 'live' ? 'Data status' : 'Demo status' }}</span>
                 <strong id="market-freshness">{{ $service->isStale($rates['24K']) ? 'Stale' : 'Current' }}</strong>
                 <p id="market-source">Source: {{ $service->activeSource() ?? 'Not configured' }}</p>
                 <a href="{{ route('catalog.index') }}">Browse certified gold →</a>
@@ -65,7 +88,7 @@
         <article class="trend-chart-panel" id="live-trend-panel">
             <div class="trend-chart-heading">
                 <div>
-                    <span class="kicker">Authorized market history</span>
+                    <span class="kicker" id="trend-data-label">{{ $historyLabel }}</span>
                     <h2>Gold price trend</h2>
                     <small>INR per 10 grams · one verified observation per day</small>
                 </div>
@@ -131,11 +154,9 @@
             </section>
         </div>
 
-        <div class="source-disclaimer">
-            <b>ⓘ Data integrity notice</b>
-            <p>The graph uses one observation per day from a single active source. Demo rows are never mixed with real
-                provider rows. The browser checks this Laravel endpoint every {{ $pollSeconds }} seconds, while the scheduler
-                obtains new authorized rates every 15 minutes.</p>
+        <div class="source-disclaimer {{ $dataMode === 'demo' ? 'demo-disclaimer' : '' }}">
+            <b>ⓘ <span id="data-disclaimer-title">{{ $disclaimerTitle }}</span></b>
+            <p id="data-disclaimer">{{ $disclaimerCopy }}</p>
         </div>
     </section>
 
@@ -407,17 +428,29 @@
 
                     const rate24 = payload.rates['24K'];
                     if (rate24) {
-                        const change = Number(rate24.market_change);
-                        document.getElementById('market-trend').textContent = change >= 0 ? 'Positive' : 'Negative';
+                        document.getElementById('market-trend').textContent = payload.signal.trend;
                         document.getElementById('market-freshness').textContent = rate24.stale ? 'Stale' : 'Current';
-                        document.getElementById('market-recommendation').textContent = change < -50
-                            ? 'Favourable buying window'
-                            : (change > 100 ? 'Consider watching the market' : 'Market is steady');
+                        document.getElementById('market-recommendation').textContent = payload.signal.label;
                     }
 
-                    status.textContent = 'Latest check ' + new Date().toLocaleTimeString('en-IN') +
+                    const statusBar = status.closest('.live-rate-bar');
+                    statusBar?.classList.remove('has-error');
+                    statusBar?.classList.toggle('is-demo', payload.is_demo);
+                    document.getElementById('feed-kind').textContent = payload.mode === 'demo'
+                        ? 'Demonstration dataset'
+                        : (payload.mode === 'live' ? 'Authorized market feed' : 'Data unavailable');
+                    document.getElementById('trend-data-label').textContent = payload.mode === 'demo'
+                        ? 'Demonstration price history'
+                        : (payload.mode === 'live' ? 'Authorized market history' : 'No price history');
+                    document.getElementById('data-disclaimer-title').textContent = payload.mode === 'demo'
+                        ? 'Demonstration data notice'
+                        : 'Data integrity notice';
+                    document.getElementById('data-disclaimer').textContent = payload.disclaimer;
+                    document.querySelector('.source-disclaimer')?.classList.toggle('demo-disclaimer', payload.is_demo);
+
+                    const coverage = payload.coverage?.to ? ' · Through ' + payload.coverage.to : '';
+                    status.textContent = 'Latest check ' + new Date().toLocaleTimeString('en-IN') + coverage +
                         ' · Source: ' + (payload.source || 'not configured');
-                    status.closest('.live-rate-bar')?.classList.remove('has-error');
                 } catch (error) {
                     status.textContent = 'Update check failed; showing the last verified stored rate.';
                     status.closest('.live-rate-bar')?.classList.add('has-error');

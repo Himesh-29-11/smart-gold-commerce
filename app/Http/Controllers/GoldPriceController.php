@@ -11,15 +11,14 @@ class GoldPriceController extends Controller
     {
         $rates = $service->latestRates();
         $history = $service->dailyHistory(30);
-        $change = (float) ($rates['24K']?->market_change ?? 0);
-        $recommendation = $change < -50
-            ? 'Favourable buying window'
-            : ($change > 100 ? 'Consider watching the market' : 'Market is steady');
+        $signal = $service->marketSignal($rates['24K']);
 
         return view('gold-prices', [
             'rates' => $rates,
             'history' => $history,
-            'recommendation' => $recommendation,
+            'recommendation' => $signal['label'],
+            'marketTrend' => $signal['trend'],
+            'dataMode' => $service->dataMode(),
             'service' => $service,
             'pollSeconds' => (int) config('gold.dashboard_poll_seconds'),
         ]);

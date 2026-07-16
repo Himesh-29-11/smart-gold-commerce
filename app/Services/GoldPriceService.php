@@ -54,6 +54,32 @@ class GoldPriceService
         return $this->latest('24K')?->source ?? $this->latest('22K')?->source;
     }
 
+    public function dataMode(): string
+    {
+        if (! $this->latest('24K') && ! $this->latest('22K')) {
+            return 'unavailable';
+        }
+
+        return $this->activeSource() === DemoGoldPriceService::SOURCE ? 'demo' : 'live';
+    }
+
+    public function marketSignal(?GoldPriceHistory $rate): array
+    {
+        if (! $rate || (float) $rate->price_per_gram <= 0) {
+            return ['label' => 'Unavailable', 'trend' => 'Unknown', 'change_percent' => 0.0];
+        }
+
+        $percentage = ((float) $rate->market_change / (float) $rate->price_per_gram) * 100;
+        if ($percentage >= 0.35) {
+            return ['label' => 'Upward movement', 'trend' => 'Rising', 'change_percent' => round($percentage, 3)];
+        }
+        if ($percentage <= -0.35) {
+            return ['label' => 'Price easing', 'trend' => 'Falling', 'change_percent' => round($percentage, 3)];
+        }
+
+        return ['label' => 'Market is steady', 'trend' => 'Stable', 'change_percent' => round($percentage, 3)];
+    }
+
     /**
      * Return one genuine closing observation per day for the active source.
      * Demo rows and authorized-provider rows are never mixed in one graph.
@@ -110,6 +136,12 @@ class GoldPriceService
         if (! $rate) {
             throw ValidationException::withMessages([
                 'cart' => "The {$product->purity} market rate is unavailable. Checkout is temporarily paused.",
+            ]);
+        }
+
+        if ($rate->source === DemoGoldPriceService::SOURCE && ! config('gold.allow_demo_checkout')) {
+            throw ValidationException::withMessages([
+                'cart' => 'Checkout is disabled while the website is using demonstration gold prices.',
             ]);
         }
 
