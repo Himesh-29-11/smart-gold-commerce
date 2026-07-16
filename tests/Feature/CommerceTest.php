@@ -119,8 +119,16 @@ class CommerceTest extends TestCase
         $customer = User::where('email', 'customer@aurumtrust.test')->firstOrFail();
         $admin = User::where('email', 'admin@aurumtrust.test')->firstOrFail();
 
-        $this->get('/login')->assertOk()->assertSee('Sign in securely');
-        $this->get('/register')->assertOk()->assertSee('Create secure account');
+        $this->get('/login')
+            ->assertOk()
+            ->assertSee('Sign in securely')
+            ->assertSee('data-password-toggle', escape: false)
+            ->assertSee('aria-controls="login-password"', escape: false);
+        $this->get('/register')
+            ->assertOk()
+            ->assertSee('Create secure account')
+            ->assertSee('aria-controls="register-password"', escape: false)
+            ->assertSee('aria-controls="register-password-confirmation"', escape: false);
         $this->get(route('catalog.show', $product))->assertOk()->assertSee($product->name);
         $this->actingAs($customer)->get(route('account.dashboard'))->assertOk()->assertSee('Recent orders');
 

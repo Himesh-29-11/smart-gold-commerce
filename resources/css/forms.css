@@ -1,0 +1,101 @@
+/* Shared form states and accessible controls. */
+
+.password-control {
+    position: relative;
+}
+
+.password-control input {
+    padding-right: 3.25rem;
+}
+
+.password-toggle {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #67736e;
+    display: inline-flex;
+    height: 2.35rem;
+    justify-content: center;
+    padding: 0;
+    position: absolute;
+    right: .35rem;
+    top: calc(50% + 3px);
+    transform: translateY(-50%);
+    transition: background .18s ease, color .18s ease;
+    width: 2.35rem;
+}
+
+.password-toggle:hover {
+    background: #eef2ef;
+    color: var(--green);
+}
+
+.password-toggle:focus-visible {
+    border-radius: 2px;
+    box-shadow: 0 0 0 3px rgba(184, 138, 56, .2);
+    color: var(--green);
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+}
+
+.password-toggle svg {
+    height: 1.2rem;
+    pointer-events: none;
+    width: 1.2rem;
+}
+
+.password-toggle .eye-closed {
+    display: none;
+}
+
+.password-toggle[aria-pressed="true"] .eye-open {
+    display: none;
+}
+
+.password-toggle[aria-pressed="true"] .eye-closed {
+    display: block;
+}
+
+.field-hint,
+.field-error {
+    display: block;
+    font-size: .68rem;
+    line-height: 1.4;
+    margin-top: .35rem;
+}
+
+.field-hint {
+    color: var(--muted);
+    font-weight: 500;
+}
+
+.field-error {
+    color: var(--danger);
+    font-weight: 700;
+}
+
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(163, 60, 52, .08);
+}
+
+.check > span {
+    flex: 1;
+}
+
+.button:disabled,
+button[aria-busy="true"] {
+    cursor: not-allowed;
+    opacity: .58;
+    transform: none;
+}
+
+.auth-card label {
+    text-align: left;
+}
+
+.auth-card .password-control {
+    width: 100%;
+}

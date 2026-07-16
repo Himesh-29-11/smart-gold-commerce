@@ -1,6 +1,7 @@
 import './bootstrap';
 import '../css/gold-dashboard.css';
 import '../css/catalog.css';
+import '../css/forms.css';
 import Chart from 'chart.js/auto';
 
 window.Chart = Chart;
@@ -8,6 +9,22 @@ window.Chart = Chart;
 const navToggle = document.querySelector('[data-nav-toggle]');
 const nav = document.querySelector('[data-nav]');
 navToggle?.addEventListener('click', () => nav?.classList.toggle('open'));
+
+document.querySelectorAll('[data-password-toggle]').forEach(button => {
+    const input = document.getElementById(button.getAttribute('aria-controls'));
+    if (!input) return;
+
+    const showLabel = button.getAttribute('aria-label') || 'Show password';
+    const hideLabel = showLabel.replace(/^Show/i, 'Hide');
+
+    button.addEventListener('click', () => {
+        const reveal = input.type === 'password';
+        input.type = reveal ? 'text' : 'password';
+        button.setAttribute('aria-pressed', reveal ? 'true' : 'false');
+        button.setAttribute('aria-label', reveal ? hideLabel : showLabel);
+        button.setAttribute('title', reveal ? hideLabel : showLabel);
+    });
+});
 
 document.querySelectorAll('[data-emi-calculator]').forEach(() => {
     const amount = document.getElementById('loanAmount');
