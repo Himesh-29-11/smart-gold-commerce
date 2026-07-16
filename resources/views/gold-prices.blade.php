@@ -1,8 +1,5 @@
 @extends('layouts.app')
 @section('title', 'Live Gold Price Dashboard')
-@push('head')
-    @vite('resources/css/gold-dashboard.css')
-@endpush
 @section('content')
     <section class="page-hero price-hero">
         <span class="kicker">Market intelligence</span>
