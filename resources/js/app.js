@@ -3,6 +3,7 @@ import '../css/gold-dashboard.css';
 import '../css/catalog.css';
 import '../css/forms.css';
 import '../css/admin.css';
+import '../css/tracking.css';
 import Chart from 'chart.js/auto';
 
 window.Chart = Chart;

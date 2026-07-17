@@ -17,7 +17,9 @@ use App\Http\Controllers\GoldPriceController;
 use App\Http\Controllers\GoldPriceDataController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,11 @@ Route::middleware(['auth', 'active', 'otp'])->group(function () {
     Route::get('/account/orders', [AccountController::class, 'orders'])->name('orders.index');
     Route::get('/account/orders/{order}', [AccountController::class, 'show'])->name('orders.show');
     Route::get('/account/orders/{order}/invoice', [AccountController::class, 'invoice'])->name('orders.invoice');
+    Route::get('/account/orders/{order}/tracking', [TrackingController::class, 'show'])->name('orders.tracking');
+    Route::get('/account/orders/{order}/tracking-data', [TrackingController::class, 'data'])->middleware('throttle:120,1')->name('orders.tracking.data');
+    Route::get('/account/notifications', [NotificationController::class, 'index'])->name('account.notifications');
+    Route::post('/account/notifications/read-all', [NotificationController::class, 'readAll'])->name('account.notifications.read-all');
+    Route::post('/account/notifications/{notification}/read', [NotificationController::class, 'read'])->name('account.notifications.read');
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
     Route::post('/gold/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');

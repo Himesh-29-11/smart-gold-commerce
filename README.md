@@ -204,6 +204,23 @@ Subscribe to `checkout.session.completed`. The app checks Stripe's signed timest
 
 Both integrations use hosted/overlay provider checkout. Production onboarding still requires merchant KYC, tested refund/dispute flows, webhook replay tests, reconciliation, and approved legal copy.
 
+## Customer notifications and delivery tracking
+
+Paid orders receive an internal tracking ID, an itemized payment-confirmation email, and an in-app notification. Admin fulfilment changes create shipment timeline events and send email/database notifications. Customers can use:
+
+```text
+/account/notifications
+/account/orders/{order}/tracking
+```
+
+The tracking page polls a protected JSON endpoint every 30 seconds. Approximate courier coordinates are rounded before they are returned to the browser. Configure a domain-restricted Google Maps browser key only after a contracted courier is permitted to supply location data:
+
+```dotenv
+GOOGLE_MAPS_API_KEY=
+```
+
+Without a key or courier coordinates, the page safely falls back to the tracking ID and milestone timeline. `CourierConnector` is the provider-neutral contract for a future Shiprocket, Delhivery, Blue Dart, or other approved adapter. WhatsApp is intentionally disabled until an official WhatsApp Business provider, customer opt-in, and approved message templates are available.
+
 ## Financing-provider integration boundary
 
 A request is stored locally only after explicit consent and is assigned to the selected verified partner. The app deliberately does not collect KYC file uploads. `TransmitLoanRequest` provides a queued, idempotent HTTPS handoff through `ConfiguredHttpLoanConnector`. It activates only when the selected partner slug matches a credentialed connection:

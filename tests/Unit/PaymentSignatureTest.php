@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
-use App\Services\Payments\PaymentGatewayManager;
 use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
@@ -36,6 +35,7 @@ class PaymentSignatureTest extends TestCase
         $this->assertTrue($service->handleWebhook('razorpay', $raw, ['x-razorpay-signature' => [$signature]]));
         $this->assertSame('paid', $payment->fresh()->status);
         $this->assertSame('paid', $order->fresh()->payment_status);
+        $this->assertDatabaseHas('shipments', ['order_id' => $order->id, 'status' => 'order_confirmed']);
     }
 
     public function test_valid_stripe_webhook_checks_signature_amount_and_currency(): void
@@ -71,7 +71,7 @@ class PaymentSignatureTest extends TestCase
     public function test_invalid_signature_is_rejected(): void
     {
         config(['services.razorpay.webhook_secret' => 'test-secret']);
-        $service = new PaymentService(app(PaymentGatewayManager::class));
+        $service = app(PaymentService::class);
         $raw = json_encode(['event' => 'payment.captured'], JSON_THROW_ON_ERROR);
         $this->assertFalse($service->handleWebhook('razorpay', $raw, ['x-razorpay-signature' => ['bad']]));
     }

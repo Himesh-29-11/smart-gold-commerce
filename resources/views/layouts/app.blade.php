@@ -24,6 +24,7 @@
             <a href="{{ route('loans.index') }}" @class(['active' => request()->routeIs('loans.*')])>Gold financing</a>
             @auth
                 <a href="{{ route('wishlist.index') }}">♡ Wishlist</a>
+                <a href="{{ route('account.notifications') }}">Notifications <span class="nav-count">{{ auth()->user()->unreadNotifications()->count() }}</span></a>
                 <a href="{{ route('cart.index') }}">Bag <span
                         class="nav-count">{{ auth()->user()->cart?->items()->sum('quantity') ?? 0 }}</span></a>
                 @if (auth()->user()->isAdmin())

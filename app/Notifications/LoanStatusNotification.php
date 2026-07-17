@@ -15,7 +15,19 @@ class LoanStatusNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'category' => 'loan',
+            'title' => 'Loan request updated',
+            'message' => $this->loan->reference.' is now '.str_replace('_', ' ', $this->loan->status).'.',
+            'status' => $this->loan->status,
+            'reference' => $this->loan->reference,
+            'url' => route('loans.index'),
+        ];
     }
 
     public function toMail(object $notifiable): MailMessage

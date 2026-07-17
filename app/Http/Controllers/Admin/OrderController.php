@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\ShipmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,14 +54,16 @@ class OrderController extends Controller
         ]);
     }
 
-    public function update(Request $request, Order $order): RedirectResponse
+    public function update(Request $request, Order $order, ShipmentService $shipments): RedirectResponse
     {
         $data = $request->validate([
             'status' => 'required|in:'.implode(',', self::STATUSES),
         ]);
 
-        DB::transaction(function () use ($order, $data): void {
+        $statusChanged = false;
+        $updatedOrder = DB::transaction(function () use ($order, $data, &$statusChanged): Order {
             $lockedOrder = Order::lockForUpdate()->findOrFail($order->id);
+            $statusChanged = $lockedOrder->status !== $data['status'];
 
             if ($lockedOrder->payment_status === 'paid' && $data['status'] === 'cancelled') {
                 throw ValidationException::withMessages([
@@ -81,8 +84,14 @@ class OrderController extends Controller
             }
 
             $lockedOrder->update($data);
+
+            return $lockedOrder;
         });
 
-        return back()->with('success', 'Order status updated.');
+        if ($statusChanged) {
+            $shipments->syncFromOrderStatus($updatedOrder);
+        }
+
+        return back()->with('success', 'Order status updated and the customer was notified.');
     }
 }

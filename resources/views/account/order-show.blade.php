@@ -53,6 +53,7 @@
                 </dl>
                 <div class="summary-total"><span>Total</span><strong>₹{{ number_format($order->total, 2) }}</strong></div>
                 @if ($order->payment_status === 'paid')
+                    <a class="button full" href="{{ route('orders.tracking', $order) }}">Track delivery</a>
                     <a class="button button-outline full" href="{{ route('orders.invoice', $order) }}" target="_blank">View
                         / print invoice</a>
                 @elseif($order->status !== 'cancelled')

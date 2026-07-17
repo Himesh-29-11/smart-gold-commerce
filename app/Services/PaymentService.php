@@ -13,7 +13,10 @@ use RuntimeException;
 
 class PaymentService
 {
-    public function __construct(private readonly PaymentGatewayManager $gateways) {}
+    public function __construct(
+        private readonly PaymentGatewayManager $gateways,
+        private readonly ShipmentService $shipments,
+    ) {}
 
     public function initiate(Order $order, string $provider): array
     {
@@ -62,11 +65,11 @@ class PaymentService
 
     public function markPaid(Payment $payment, PaymentResult $result): void
     {
-        DB::transaction(function () use ($payment, $result): void {
+        $paidOrder = DB::transaction(function () use ($payment, $result): ?Order {
             $lockedPayment = Payment::lockForUpdate()->findOrFail($payment->id);
 
             if ($lockedPayment->status === 'paid') {
-                return;
+                return null;
             }
 
             $lockedPayment->update([
@@ -90,10 +93,16 @@ class PaymentService
                     ?->increment('used_count');
             }
 
-            DB::afterCommit(
-                fn () => $order->user->notify(new OrderPaidNotification($order))
-            );
+            return $order;
         });
+
+        if (! $paidOrder) {
+            return;
+        }
+
+        $this->shipments->ensureForOrder($paidOrder);
+        $paidOrder->load(['user', 'items', 'shipment']);
+        $paidOrder->user->notify(new OrderPaidNotification($paidOrder));
     }
 
     public function handleWebhook(string $provider, string $raw, array $headers): bool

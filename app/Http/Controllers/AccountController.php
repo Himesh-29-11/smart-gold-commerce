@@ -22,7 +22,7 @@ class AccountController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id || $request->user()->isAdmin(), 403);
 
-        return view('account.order-show', ['order' => $order->load(['items', 'payments'])]);
+        return view('account.order-show', ['order' => $order->load(['items', 'payments', 'shipment'])]);
     }
 
     public function invoice(Request $request, Order $order): View
