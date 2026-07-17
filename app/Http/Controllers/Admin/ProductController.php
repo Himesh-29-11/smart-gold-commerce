@@ -15,12 +15,33 @@ class ProductController extends Controller
 {
     public function index(Request $request): View
     {
+        $data = $request->validate([
+            'q' => 'nullable|string|max:100',
+            'visibility' => 'nullable|in:active,hidden',
+            'stock' => 'nullable|in:available,low,out',
+        ]);
         $query = Product::with(['category', 'partner']);
-        if ($request->filled('q')) {
-            $query->where(fn ($q) => $q->where('name', 'like', '%'.$request->q.'%')->orWhere('sku', 'like', '%'.$request->q.'%'));
-        }
 
-        return view('admin.products.index', ['products' => $query->latest()->paginate(20)->withQueryString()]);
+        if ($search = $data['q'] ?? null) {
+            $query->where(fn ($builder) => $builder
+                ->where('name', 'like', '%'.$search.'%')
+                ->orWhere('sku', 'like', '%'.$search.'%'));
+        }
+        if (($data['visibility'] ?? null) === 'active') {
+            $query->where('is_active', true);
+        } elseif (($data['visibility'] ?? null) === 'hidden') {
+            $query->where('is_active', false);
+        }
+        match ($data['stock'] ?? null) {
+            'available' => $query->where('stock_quantity', '>', 3),
+            'low' => $query->whereBetween('stock_quantity', [1, 3]),
+            'out' => $query->where('stock_quantity', 0),
+            default => null,
+        };
+
+        return view('admin.products.index', [
+            'products' => $query->latest()->paginate(20)->withQueryString(),
+        ]);
     }
 
     public function create(): View

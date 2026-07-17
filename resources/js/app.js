@@ -2,6 +2,7 @@ import './bootstrap';
 import '../css/gold-dashboard.css';
 import '../css/catalog.css';
 import '../css/forms.css';
+import '../css/admin.css';
 import Chart from 'chart.js/auto';
 
 window.Chart = Chart;
@@ -9,6 +10,17 @@ window.Chart = Chart;
 const navToggle = document.querySelector('[data-nav-toggle]');
 const nav = document.querySelector('[data-nav]');
 navToggle?.addEventListener('click', () => nav?.classList.toggle('open'));
+
+const adminSidebar = document.querySelector('[data-admin-sidebar]');
+const adminBackdrop = document.querySelector('[data-admin-nav-close]');
+const setAdminNavigation = open => {
+    adminSidebar?.classList.toggle('open', open);
+    adminBackdrop?.classList.toggle('open', open);
+    document.body.classList.toggle('admin-navigation-open', open);
+};
+document.querySelector('[data-admin-nav-toggle]')?.addEventListener('click', () => setAdminNavigation(true));
+adminBackdrop?.addEventListener('click', () => setAdminNavigation(false));
+adminSidebar?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setAdminNavigation(false)));
 
 document.querySelectorAll('[data-password-toggle]').forEach(button => {
     const input = document.getElementById(button.getAttribute('aria-controls'));

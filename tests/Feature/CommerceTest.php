@@ -132,12 +132,16 @@ class CommerceTest extends TestCase
         $this->get(route('catalog.show', $product))->assertOk()->assertSee($product->name);
         $this->actingAs($customer)->get(route('account.dashboard'))->assertOk()->assertSee('Recent orders');
 
-        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertSee('Commerce pulse');
-        $this->actingAs($admin)->get(route('admin.products.index'))->assertOk()->assertSee('Control certification details');
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertSee('Commerce overview');
+        $this->actingAs($admin)->get(route('admin.products.index'))->assertOk()->assertSee('Manage product evidence');
         $this->actingAs($admin)->get(route('admin.products.create'))->assertOk()->assertSee('Gallery media JSON');
-        $this->actingAs($admin)->get(route('admin.orders.index'))->assertOk()->assertSee('Manage operational status');
-        $this->actingAs($admin)->get(route('admin.loans.index'))->assertOk()->assertSee('N & H Trust is a connector', escape: false);
-        $this->actingAs($admin)->get(route('admin.customers.index'))->assertOk()->assertSee('Customers');
+        $this->actingAs($admin)->get(route('admin.orders.index'))->assertOk()->assertSee('Payment state comes only');
+        $this->actingAs($admin)->get(route('admin.loans.index'))->assertOk()->assertSee('Connector boundary');
+        $this->actingAs($admin)->get(route('admin.customers.index'))->assertOk()->assertSee('Review account activity');
+
+        $this->actingAs($admin)->get(route('admin.products.index', ['stock' => 'low']))->assertOk();
+        $this->actingAs($admin)->get(route('admin.orders.index', ['payment' => 'unpaid']))->assertOk();
+        $this->actingAs($admin)->get(route('admin.customers.index', ['access' => 'active']))->assertOk();
     }
 
     public function test_customer_cannot_open_another_customers_order(): void

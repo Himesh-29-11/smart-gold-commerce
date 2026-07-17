@@ -25,11 +25,26 @@ class OrderController extends Controller
 
     public function index(Request $request): View
     {
-        $request->validate(['status' => 'nullable|in:'.implode(',', self::STATUSES)]);
+        $data = $request->validate([
+            'q' => 'nullable|string|max:100',
+            'status' => 'nullable|in:'.implode(',', self::STATUSES),
+            'payment' => 'nullable|in:paid,unpaid',
+        ]);
         $query = Order::with('user');
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->string('status'));
+        if ($search = $data['q'] ?? null) {
+            $query->where(function ($builder) use ($search): void {
+                $builder->where('reference', 'like', '%'.$search.'%')
+                    ->orWhereHas('user', fn ($userQuery) => $userQuery
+                        ->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%'));
+            });
+        }
+        if ($status = $data['status'] ?? null) {
+            $query->where('status', $status);
+        }
+        if ($payment = $data['payment'] ?? null) {
+            $query->where('payment_status', $payment);
         }
 
         return view('admin.orders', [
