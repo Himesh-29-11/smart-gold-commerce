@@ -23,7 +23,7 @@ A complete Laravel 12 implementation of a gold-commerce storefront, financing-as
 
 - Revenue/order/customer/open-loan/low-stock metrics
 - 30-day paid-sales chart
-- Product CRUD, stock, visibility, pricing mode, certification, and gallery JSON
+- Product CRUD, stock, visibility, pricing mode, certification, and drag/drop image/video uploads
 - Order fulfilment management with payment/fulfilment separation
 - Customer account activation/deactivation
 - Financing request workflow and customer notification
@@ -79,6 +79,12 @@ php artisan migrate --seed
 npm install
 npm run build
 php artisan serve
+```
+
+Create the public storage link used by uploaded product images and videos:
+
+```bash
+php artisan storage:link
 ```
 
 Open `http://127.0.0.1:8000`.

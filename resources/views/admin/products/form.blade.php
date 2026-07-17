@@ -7,7 +7,7 @@
             <p>All purity and certification claims must match partner-supplied evidence.</p>
         </div><a class="button button-outline" href="{{ route('admin.products.index') }}">← Products</a>
     </div>
-    <form class="admin-panel admin-form" method="POST"
+    <form class="admin-panel admin-form" method="POST" enctype="multipart/form-data"
         action="{{ $product->exists ? route('admin.products.update', $product) : route('admin.products.store') }}">@csrf
         @if ($product->exists)
             @method('PUT')
@@ -29,14 +29,54 @@
                         @endforeach
                     </select></label><label class="span-2">Description
                     <textarea name="description" rows="5" required>{{ old('description', $product->description) }}</textarea>
-                </label><label class="span-2">Image URL<input name="image_url"
-                        value="{{ old('image_url', $product->image_url) }}" required><small>Use an approved local asset or
-                        trusted media CDN URL.</small></label><label class="span-2">Gallery media JSON
-                    <small>(optional)</small>
-                    <textarea name="gallery_json" rows="4"
-                        placeholder='[{"type":"video","url":"https://approved-cdn.example/story.mp4","poster":"/images/poster.jpg"}]'>{{ old('gallery_json', $product->gallery ? json_encode($product->gallery, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) : '') }}</textarea><small>Approved images: {type: image, url: …}; promotional videos: {type:
-                        video, url: …, poster: …}. Never hotlink unlicensed media.</small>
-                </label></div>
+                </label>
+                <div class="span-2 product-media-editor">
+                    <div class="media-editor-heading">
+                        <div><h3>Product image & media</h3><p>Upload approved product photography and optional gallery images or videos.</p></div>
+                        <span>Images up to 5 MB · Videos up to 25 MB</span>
+                    </div>
+
+                    <div class="primary-media-row">
+                        @if ($product->exists && $product->image_url)
+                            <div class="current-primary-media"><img src="{{ $product->image_url }}" alt="Current primary image"><span>Current primary image</span></div>
+                        @endif
+                        <label class="upload-dropzone primary-dropzone" data-upload-dropzone data-preview-target="primary-preview">
+                            <input type="file" name="primary_image" accept="image/jpeg,image/png,image/webp" @required(!$product->exists)>
+                            <span class="upload-icon" aria-hidden="true">⇧</span>
+                            <strong>{{ $product->exists ? 'Replace primary image' : 'Upload primary image' }}</strong>
+                            <small>Drag and drop JPG, PNG or WebP here, or click to browse.</small>
+                        </label>
+                        <div class="upload-preview" id="primary-preview" aria-live="polite"></div>
+                    </div>
+                    @error('primary_image')<small class="field-error" role="alert">{{ $message }}</small>@enderror
+
+                    @if ($product->gallery)
+                        <div class="existing-gallery"><h4>Existing gallery</h4><div class="existing-gallery-grid">
+                            @foreach ($product->gallery as $index => $media)
+                                <label class="existing-media-item">
+                                    @if (data_get($media, 'type') === 'video')
+                                        <video src="{{ data_get($media, 'url') }}" muted preload="metadata"></video>
+                                    @else
+                                        <img src="{{ data_get($media, 'url') }}" alt="Gallery media {{ $index + 1 }}">
+                                    @endif
+                                    <span><input type="checkbox" name="remove_gallery[]" value="{{ $index }}"> Remove</span>
+                                </label>
+                            @endforeach
+                        </div></div>
+                    @endif
+
+                    <label class="upload-dropzone gallery-dropzone" data-upload-dropzone data-preview-target="gallery-preview">
+                        <input type="file" name="gallery_files[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" multiple>
+                        <span class="upload-icon" aria-hidden="true">＋</span>
+                        <strong>Add gallery media</strong>
+                        <small>Drag multiple images or videos here, or click to browse.</small>
+                    </label>
+                    <label class="folder-upload-button">Select an entire media folder<input type="file" name="gallery_folder[]" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" webkitdirectory directory multiple data-folder-upload data-preview-target="gallery-preview"></label>
+                    <div class="upload-preview gallery-preview" id="gallery-preview" aria-live="polite"></div>
+                    @error('gallery_files.*')<small class="field-error" role="alert">{{ $message }}</small>@enderror
+                    @error('gallery_folder.*')<small class="field-error" role="alert">{{ $message }}</small>@enderror
+                </div>
+            </div>
         </div>
         <div class="form-section">
             <h2>Gold details</h2>

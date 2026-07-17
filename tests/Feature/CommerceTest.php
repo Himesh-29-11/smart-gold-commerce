@@ -134,7 +134,7 @@ class CommerceTest extends TestCase
 
         $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertSee('Commerce overview');
         $this->actingAs($admin)->get(route('admin.products.index'))->assertOk()->assertSee('Manage product evidence');
-        $this->actingAs($admin)->get(route('admin.products.create'))->assertOk()->assertSee('Gallery media JSON');
+        $this->actingAs($admin)->get(route('admin.products.create'))->assertOk()->assertSee('Product image & media', escape: false)->assertSee('Add gallery media');
         $this->actingAs($admin)->get(route('admin.orders.index'))->assertOk()->assertSee('Payment state comes only');
         $this->actingAs($admin)->get(route('admin.loans.index'))->assertOk()->assertSee('Connector boundary');
         $this->actingAs($admin)->get(route('admin.customers.index'))->assertOk()->assertSee('Review account activity');
