@@ -5,6 +5,7 @@
     align-items: center;
     background: #eef5f1;
     border: 1px solid #d7e6de;
+    border-radius: 12px;
     color: #315247;
     display: flex;
     flex-wrap: wrap;
@@ -12,6 +13,7 @@
     gap: .55rem;
     margin-bottom: 1.25rem;
     padding: .75rem 1rem;
+    box-shadow: 0 4px 15px rgba(46, 128, 97, 0.05);
 }
 
 .live-rate-bar.has-error {
@@ -39,20 +41,29 @@
 .market-metric-card {
     background: #fff;
     border: 1px solid #dfe3df;
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(18, 42, 35, .06);
     display: flex;
     flex-direction: column;
     min-height: 12.5rem;
     min-width: 0;
     padding: 1.25rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.market-metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(18, 42, 35, .12);
 }
 
 .market-metric-card::before {
-    background: var(--gold);
+    background: linear-gradient(135deg, var(--gold), #ffb74d);
     content: '';
     display: block;
-    height: 3px;
+    height: 4px;
     margin: -1.25rem -1.25rem 1rem;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
 .metric-card-heading {
@@ -134,9 +145,10 @@
 }
 
 .trend-chart-panel {
-    background: #22252b;
-    border: 0;
-    box-shadow: 0 18px 50px rgba(13, 16, 20, .18);
+    background: linear-gradient(145deg, #22252b, #1a1c20);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    box-shadow: 0 18px 50px rgba(13, 16, 20, .4);
     color: #f4f5f6;
     margin-top: 0;
     min-width: 0;
@@ -294,7 +306,16 @@
 .dashboard-context-card {
     background: #fff;
     border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(18, 42, 35, .04);
     padding: 1.4rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.weight-calculator-card:hover,
+.dashboard-context-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(18, 42, 35, .08);
 }
 
 .support-card-heading {
@@ -336,10 +357,16 @@
 
 .weight-estimates > div {
     background: var(--cream);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
     min-width: 0;
     padding: .8rem 1rem;
+    transition: background 0.3s ease;
+}
+
+.weight-estimates > div:hover {
+    background: #f7ede2;
 }
 
 .weight-estimates span {
