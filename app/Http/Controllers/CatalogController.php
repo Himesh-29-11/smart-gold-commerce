@@ -17,7 +17,7 @@ class CatalogController extends Controller
             'category' => 'nullable|string|max:80',
             'purity' => 'nullable|in:22K,24K',
             'weight' => 'nullable|in:under-5,5-20,over-20',
-            'sort' => 'nullable|in:newest,weight-asc,weight-desc',
+            'sort' => 'nullable|in:newest,weight-asc,weight-desc,name-asc',
         ]);
 
         $query = Product::active()->with(['category', 'partner', 'approvedReviews']);
@@ -43,12 +43,16 @@ class CatalogController extends Controller
         match ($data['sort'] ?? 'newest') {
             'weight-asc' => $query->orderBy('weight_grams'),
             'weight-desc' => $query->orderByDesc('weight_grams'),
+            'name-asc' => $query->orderBy('name'),
             default => $query->latest(),
         };
 
         return view('catalog.index', [
-            'products' => $query->paginate(12)->withQueryString(),
+            'products' => $query->paginate(16)->withQueryString(),
             'categories' => Category::where('is_active', true)->get(),
+            'wishlistProductIds' => auth()->check()
+                ? auth()->user()->wishlist()->pluck('product_id')->all()
+                : [],
             'priceService' => $prices,
         ]);
     }

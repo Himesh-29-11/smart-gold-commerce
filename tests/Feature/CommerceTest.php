@@ -26,10 +26,10 @@ class CommerceTest extends TestCase
         $this->get('/')->assertOk()->assertSee('Gold you can trust');
         $this->get('/gold')
             ->assertOk()
-            ->assertSee('Find your gold')
-            ->assertSee('catalog-shell', escape: false)
-            ->assertSee('catalog-grid', escape: false)
-            ->assertSee('Show matching gold');
+            ->assertSee('Gold & Jewellery', escape: false)
+            ->assertSee('collection-shortcuts', escape: false)
+            ->assertSee('collection-product-grid', escape: false)
+            ->assertSee('Filter & sort', escape: false);
         $this->get('/gold-prices')
             ->assertOk()
             ->assertSee('Gold prices, in perspective')
