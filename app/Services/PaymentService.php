@@ -16,6 +16,7 @@ class PaymentService
     public function __construct(
         private readonly PaymentGatewayManager $gateways,
         private readonly ShipmentService $shipments,
+        private readonly NotificationDeliveryService $notifications,
     ) {}
 
     public function initiate(Order $order, string $provider): array
@@ -102,7 +103,7 @@ class PaymentService
 
         $this->shipments->ensureForOrder($paidOrder);
         $paidOrder->load(['user', 'items', 'shipment']);
-        $paidOrder->user->notify(new OrderPaidNotification($paidOrder));
+        $this->notifications->send($paidOrder->user, new OrderPaidNotification($paidOrder));
     }
 
     public function handleWebhook(string $provider, string $raw, array $headers): bool

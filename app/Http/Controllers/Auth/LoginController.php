@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Notifications\LoginNotification;
+use App\Services\NotificationDeliveryService;
 use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +18,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function store(Request $request, OtpService $otp): RedirectResponse
+    public function store(Request $request, OtpService $otp, NotificationDeliveryService $notifications): RedirectResponse
     {
         $credentials = $request->validate(['email' => 'required|email', 'password' => 'required|string']);
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -33,6 +35,12 @@ class LoginController extends Controller
 
             return redirect()->route('otp.show');
         }
+
+        $notifications->send($user, new LoginNotification(
+            ipAddress: $request->ip() ?? 'Unknown',
+            userAgent: (string) $request->userAgent(),
+            occurredAt: now(),
+        ));
 
         return redirect()->intended($user->isAdmin() ? route('admin.dashboard') : route('account.dashboard'));
     }
