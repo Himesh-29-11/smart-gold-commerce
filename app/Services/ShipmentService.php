@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 
 class ShipmentService
 {
+    public function __construct(private readonly NotificationDeliveryService $notifications) {}
+
     private const ORDER_STATUS_MAP = [
         'confirmed' => ['order_confirmed', 'Order confirmed', 'Payment is verified and the order entered fulfilment.'],
         'processing' => ['packed', 'Order packed', 'The order has been secured and prepared for dispatch.'],
@@ -108,7 +110,7 @@ class ShipmentService
 
         $shipment->refresh()->load('order.user');
         if ($previousStatus !== $status) {
-            DB::afterCommit(fn () => $shipment->order->user->notify(new ShipmentStatusNotification($shipment, $title)));
+            $this->notifications->send($shipment->order->user, new ShipmentStatusNotification($shipment, $title));
         }
 
         return $shipment;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\LoanRequest;
 use App\Notifications\LoanStatusNotification;
+use App\Services\NotificationDeliveryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -36,12 +37,18 @@ class LoanController extends Controller
         ]);
     }
 
-    public function update(Request $request, LoanRequest $loan): RedirectResponse
+    public function update(Request $request, LoanRequest $loan, NotificationDeliveryService $notifications): RedirectResponse
     {
         $data = $request->validate(['status' => 'required|in:submitted,under_review,documents_required,forwarded,approved,rejected,closed', 'admin_notes' => 'nullable|string|max:2000']);
+        $statusChanged = $loan->status !== $data['status'];
         $loan->update($data);
-        $loan->user->notify(new LoanStatusNotification($loan));
 
-        return back()->with('success', 'Loan request updated.');
+        if ($statusChanged) {
+            $notifications->send($loan->user, new LoanStatusNotification($loan));
+        }
+
+        return back()->with('success', $statusChanged
+            ? 'Loan request updated and the customer was notified.'
+            : 'Loan request notes updated.');
     }
 }
