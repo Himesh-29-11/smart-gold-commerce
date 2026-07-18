@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\SendNotificationMail;
 use App\Models\LoanRequest;
 use App\Models\Partner;
 use App\Models\User;
 use App\Notifications\LoanStatusNotification;
 use App\Notifications\LoginNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class NotificationTest extends TestCase
@@ -16,6 +18,7 @@ class NotificationTest extends TestCase
 
     public function test_verified_login_creates_an_in_app_security_notification(): void
     {
+        Queue::fake();
         $user = User::factory()->create([
             'otp_verified_at' => now(),
             'is_active' => true,
@@ -30,10 +33,12 @@ class NotificationTest extends TestCase
             'notifiable_id' => $user->id,
             'type' => LoginNotification::class,
         ]);
+        Queue::assertPushed(SendNotificationMail::class);
     }
 
     public function test_admin_loan_status_change_creates_customer_notification(): void
     {
+        Queue::fake();
         $admin = User::factory()->create([
             'role' => 'admin',
             'otp_verified_at' => now(),
@@ -75,5 +80,6 @@ class NotificationTest extends TestCase
             'notifiable_id' => $customer->id,
             'type' => LoanStatusNotification::class,
         ]);
+        Queue::assertPushed(SendNotificationMail::class);
     }
 }

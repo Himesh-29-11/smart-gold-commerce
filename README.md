@@ -261,7 +261,7 @@ php artisan schedule:work
 php artisan queue:work --tries=3 --timeout=90
 ```
 
-The current mail notifications work with a synchronous queue too. Switch to Redis/database queues for production latency and resilience.
+In-app notifications are written immediately. Notification email is queued so an unavailable SMTP server cannot block login, loan approval, payment confirmation, or shipment updates. Keep a queue worker running locally and in production; use Redis or the database queue with process supervision for resilience.
 
 ## Tests and quality checks
 
