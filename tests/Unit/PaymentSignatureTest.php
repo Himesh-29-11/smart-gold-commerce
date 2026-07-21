@@ -2,11 +2,13 @@
 
 namespace Tests\Unit;
 
+use App\Mail\OrderInvoiceMail;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -17,6 +19,7 @@ class PaymentSignatureTest extends TestCase
     public function test_valid_razorpay_webhook_marks_payment_paid(): void
     {
         Notification::fake();
+        Mail::fake();
         config(['services.razorpay.webhook_secret' => 'test-secret']);
         $user = User::factory()->create(['otp_verified_at' => now()]);
         $order = Order::create([
@@ -36,11 +39,13 @@ class PaymentSignatureTest extends TestCase
         $this->assertSame('paid', $payment->fresh()->status);
         $this->assertSame('paid', $order->fresh()->payment_status);
         $this->assertDatabaseHas('shipments', ['order_id' => $order->id, 'status' => 'order_confirmed']);
+        Mail::assertQueued(OrderInvoiceMail::class, fn ($mail) => $mail->order->is($order));
     }
 
     public function test_valid_stripe_webhook_checks_signature_amount_and_currency(): void
     {
         Notification::fake();
+        Mail::fake();
         config(['services.stripe.webhook_secret' => 'stripe-test-secret']);
         $user = User::factory()->create(['otp_verified_at' => now()]);
         $order = Order::create([

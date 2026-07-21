@@ -212,7 +212,7 @@ Both integrations use hosted/overlay provider checkout. Production onboarding st
 
 ## Customer notifications and delivery tracking
 
-Paid orders receive an internal tracking ID, an itemized payment-confirmation email, and an in-app notification. Admin fulfilment changes create shipment timeline events and send email/database notifications. Customers can use:
+Paid orders receive an internal tracking ID, an in-app payment notification, and a queued `OrderInvoiceMail` with branded HTML, embedded local product images and a generated PDF invoice attachment. Admin fulfilment changes create shipment timeline events and send email/database notifications. Customers can use:
 
 ```text
 /account/notifications

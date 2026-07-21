@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\OrderInvoiceMail;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\Payment;
@@ -103,7 +104,11 @@ class PaymentService
 
         $this->shipments->ensureForOrder($paidOrder);
         $paidOrder->load(['user', 'items', 'shipment']);
-        $this->notifications->send($paidOrder->user, new OrderPaidNotification($paidOrder));
+        $this->notifications->sendMailable(
+            $paidOrder->user,
+            new OrderPaidNotification($paidOrder),
+            new OrderInvoiceMail($paidOrder),
+        );
     }
 
     public function handleWebhook(string $provider, string $raw, array $headers): bool
