@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendNotificationMail;
 use App\Models\OtpCode;
 use App\Models\User;
 use App\Notifications\OtpNotification;
@@ -15,7 +16,7 @@ class OtpService
         OtpCode::where('user_id', $user->id)->where('purpose', $purpose)->whereNull('verified_at')->delete();
         $code = (string) random_int(100000, 999999);
         OtpCode::create(['user_id' => $user->id, 'purpose' => $purpose, 'code_hash' => Hash::make($code), 'expires_at' => now()->addMinutes(10)]);
-        $user->notify(new OtpNotification($code));
+        SendNotificationMail::dispatch($user, new OtpNotification($code));
     }
 
     public function verify(User $user, string $code, string $purpose = 'registration'): void

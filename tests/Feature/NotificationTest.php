@@ -8,6 +8,7 @@ use App\Models\Partner;
 use App\Models\User;
 use App\Notifications\LoanStatusNotification;
 use App\Notifications\LoginNotification;
+use App\Notifications\OtpNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -15,6 +16,24 @@ use Tests\TestCase;
 class NotificationTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_registration_queues_otp_email_without_blocking_request(): void
+    {
+        Queue::fake();
+
+        $this->post(route('register'), [
+            'name' => 'OTP Test User',
+            'email' => 'otp-test-user@gmail.com',
+            'phone' => '9876512345',
+            'password' => 'StrongPass123',
+            'password_confirmation' => 'StrongPass123',
+            'terms' => '1',
+        ])->assertRedirect(route('otp.show'));
+
+        $user = User::where('email', 'otp-test-user@gmail.com')->firstOrFail();
+        $this->assertDatabaseHas('otp_codes', ['user_id' => $user->id, 'purpose' => 'registration']);
+        Queue::assertPushed(SendNotificationMail::class, fn ($job) => $job->notification instanceof OtpNotification);
+    }
 
     public function test_verified_login_creates_an_in_app_security_notification(): void
     {
