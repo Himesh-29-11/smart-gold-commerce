@@ -33,7 +33,10 @@ class DemoGoldPriceServiceTest extends TestCase
         $this->assertTrue($service->isCurrent());
         $this->assertCount(365, $history['24K']);
         $this->assertCount(365, $history['22K']);
-        $this->assertSame('demo', app(GoldPriceService::class)->dataMode());
+        $goldPrices = app(GoldPriceService::class);
+        $this->assertSame('demo', $goldPrices->dataMode());
+        $this->travelTo('2026-07-16 23:59:00');
+        $this->assertFalse($goldPrices->isStale($latest));
 
         $this->assertSame(0, Artisan::call('gold:refresh-demo-history', [
             '--days' => 365,

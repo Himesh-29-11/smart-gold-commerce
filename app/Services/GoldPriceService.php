@@ -195,8 +195,15 @@ class GoldPriceService
 
     public function isStale(?GoldPriceHistory $rate): bool
     {
-        return ! $rate
-            || $rate->fetched_at->lt(now()->subMinutes((int) config('gold.stale_after_minutes')));
+        if (! $rate) {
+            return true;
+        }
+
+        if ($rate->source === DemoGoldPriceService::SOURCE) {
+            return ! $rate->fetched_at->isToday();
+        }
+
+        return $rate->fetched_at->lt(now()->subMinutes((int) config('gold.stale_after_minutes')));
     }
 
     private function fetchAndStore(
