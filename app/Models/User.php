@@ -54,6 +54,16 @@ class User extends Authenticatable
         return $this->hasMany(Wishlist::class);
     }
 
+    public function deliveryAssignments(): HasMany
+    {
+        return $this->hasMany(DeliveryAssignment::class, 'driver_id');
+    }
+
+    public function isDriver(): bool
+    {
+        return $this->role === 'driver';
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

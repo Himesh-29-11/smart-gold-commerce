@@ -42,7 +42,11 @@ class LoginController extends Controller
             occurredAt: now(),
         ));
 
-        return redirect()->intended($user->isAdmin() ? route('admin.dashboard') : route('account.dashboard'));
+        $destination = $user->isAdmin()
+            ? route('admin.dashboard')
+            : ($user->isDriver() ? route('driver.dashboard') : route('account.dashboard'));
+
+        return redirect()->intended($destination);
     }
 
     public function destroy(Request $request): RedirectResponse

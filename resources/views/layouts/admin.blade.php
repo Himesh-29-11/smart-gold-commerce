@@ -37,6 +37,9 @@
                 <a @class(['active' => request()->routeIs('admin.loans.*')]) href="{{ route('admin.loans.index') }}">
                     <i aria-hidden="true">₹</i><span>Loan requests</span>
                 </a>
+                <a @class(['active' => request()->routeIs('admin.drivers.*')]) href="{{ route('admin.drivers.index') }}">
+                    <i aria-hidden="true">🛵</i><span>Delivery team</span>
+                </a>
 
                 <span class="admin-nav-label">Reports</span>
                 <a href="{{ route('admin.reports.orders') }}">

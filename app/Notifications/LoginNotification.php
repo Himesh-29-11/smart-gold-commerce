@@ -31,7 +31,9 @@ class LoginNotification extends Notification
             'message' => 'Your account was accessed from '.$this->ipAddress.' on '.$this->occurredAt->format('d M Y, h:i A').' IST.',
             'status' => 'login',
             'reference' => null,
-            'url' => $notifiable->isAdmin() ? route('admin.dashboard') : route('account.dashboard'),
+            'url' => $notifiable->isAdmin()
+                ? route('admin.dashboard')
+                : ($notifiable->isDriver() ? route('driver.dashboard') : route('account.dashboard')),
             'ip_address' => $this->ipAddress,
             'device' => Str::limit($this->userAgent, 180),
         ];

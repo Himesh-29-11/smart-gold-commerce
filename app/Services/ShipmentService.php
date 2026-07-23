@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\DeliveryAssignment;
 use App\Models\Order;
 use App\Models\Shipment;
+use App\Models\ShipmentLocation;
+use App\Models\User;
 use App\Notifications\ShipmentStatusNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -114,6 +117,83 @@ class ShipmentService
         }
 
         return $shipment;
+    }
+
+    public function assignDriver(Shipment $shipment, User $driver, User $admin): DeliveryAssignment
+    {
+        abort_unless($driver->isDriver() && $driver->is_active, 422);
+
+        $assignment = DeliveryAssignment::updateOrCreate(
+            ['shipment_id' => $shipment->id],
+            [
+                'driver_id' => $driver->id,
+                'assigned_by' => $admin->id,
+                'status' => 'assigned',
+                'assigned_at' => now(),
+                'accepted_at' => null,
+                'started_at' => null,
+                'completed_at' => null,
+            ],
+        );
+
+        $this->recordStatus($shipment, 'assigned', 'Driver assigned', 'A verified N & H delivery person has been assigned.');
+
+        return $assignment;
+    }
+
+    public function updateAssignmentStatus(DeliveryAssignment $assignment, string $status): DeliveryAssignment
+    {
+        $updates = ['status' => $status];
+        if ($status === 'accepted') {
+            $updates['accepted_at'] = now();
+        } elseif ($status === 'active') {
+            $updates['started_at'] = now();
+        } elseif ($status === 'completed') {
+            $updates['completed_at'] = now();
+        }
+        $assignment->update($updates);
+
+        $shipment = $assignment->shipment;
+        if ($status === 'accepted') {
+            $this->recordStatus($shipment, 'driver_assigned', 'Driver accepted delivery', 'The assigned delivery person accepted this shipment.');
+        } elseif ($status === 'active') {
+            $this->recordStatus($shipment, 'out_for_delivery', 'Out for delivery', 'Approximate live location is now available while the driver page remains active.');
+        } elseif ($status === 'completed') {
+            $this->recordStatus($shipment, 'delivered', 'Order delivered', 'The assigned driver marked this delivery complete.');
+            $shipment->order()->update(['status' => 'delivered']);
+        }
+
+        return $assignment->refresh();
+    }
+
+    public function recordDriverLocation(DeliveryAssignment $assignment, User $driver, array $data): ShipmentLocation
+    {
+        abort_unless($assignment->driver_id === $driver->id, 403);
+        abort_unless(in_array($assignment->status, ['accepted', 'active'], true), 422);
+
+        if ($assignment->status !== 'active') {
+            $this->updateAssignmentStatus($assignment, 'active');
+        }
+
+        $location = ShipmentLocation::create([
+            'shipment_id' => $assignment->shipment_id,
+            'driver_id' => $driver->id,
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
+            'accuracy' => $data['accuracy'] ?? null,
+            'heading' => $data['heading'] ?? null,
+            'speed' => $data['speed'] ?? null,
+            'recorded_at' => now(),
+        ]);
+
+        $assignment->shipment()->update([
+            'current_latitude' => $data['latitude'],
+            'current_longitude' => $data['longitude'],
+            'location_updated_at' => now(),
+            'status' => 'out_for_delivery',
+        ]);
+
+        return $location;
     }
 
     private function trackingNumber(): string

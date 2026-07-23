@@ -225,7 +225,11 @@ The tracking page polls a protected JSON endpoint every 30 seconds. Approximate 
 GOOGLE_MAPS_API_KEY=
 ```
 
-Without a key or courier coordinates, the page safely falls back to the tracking ID and milestone timeline. `CourierConnector` is the provider-neutral contract for a future Shiprocket, Delhivery, Blue Dart, or other approved adapter. WhatsApp is intentionally disabled until an official WhatsApp Business provider, customer opt-in, and approved message templates are available.
+Without a key or courier coordinates, the page safely falls back to the tracking ID and milestone timeline. `CourierConnector` remains available for a future Shiprocket, Delhivery, Blue Dart, or other approved adapter.
+
+For the own-fleet workflow, administrators create active driver accounts at `/admin/drivers`, assign paid shipments, and drivers sign in at `/driver`. The mobile driver page can accept/start/complete deliveries and uses browser Geolocation to send exact coordinates every 15 seconds while the page remains active. Exact history is restricted to operations; the customer tracking endpoint rounds the latest point to three decimal places. Mobile web location sharing requires HTTPS and generally stops when the browser is closed or suspended; continuous background tracking requires a future native driver app.
+
+WhatsApp is intentionally disabled until an official WhatsApp Business provider, customer opt-in, and approved message templates are available.
 
 ## Financing-provider integration boundary
 

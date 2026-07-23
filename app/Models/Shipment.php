@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Shipment extends Model
 {
@@ -35,6 +36,16 @@ class Shipment extends Model
     public function events(): HasMany
     {
         return $this->hasMany(ShipmentEvent::class)->orderBy('occurred_at');
+    }
+
+    public function assignment(): HasOne
+    {
+        return $this->hasOne(DeliveryAssignment::class);
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(ShipmentLocation::class)->latest('recorded_at');
     }
 
     public function hasLocation(): bool

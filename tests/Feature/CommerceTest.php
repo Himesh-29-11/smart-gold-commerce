@@ -138,6 +138,7 @@ class CommerceTest extends TestCase
         $this->actingAs($admin)->get(route('admin.orders.index'))->assertOk()->assertSee('Payment state comes only');
         $this->actingAs($admin)->get(route('admin.loans.index'))->assertOk()->assertSee('Connector boundary');
         $this->actingAs($admin)->get(route('admin.customers.index'))->assertOk()->assertSee('Review account activity');
+        $this->actingAs($admin)->get(route('admin.drivers.index'))->assertOk()->assertSee('Delivery team');
 
         $this->actingAs($admin)->get(route('admin.products.index', ['stock' => 'low']))->assertOk();
         $this->actingAs($admin)->get(route('admin.orders.index', ['payment' => 'unpaid']))->assertOk();

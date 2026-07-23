@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DriverController as AdminDriverController;
 use App\Http\Controllers\Admin\GoldPriceController as AdminGoldPriceController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DriverController;
 use App\Http\Controllers\GoldPriceController;
 use App\Http\Controllers\GoldPriceDataController;
 use App\Http\Controllers\HomeController;
@@ -70,6 +72,16 @@ Route::middleware(['auth', 'active', 'otp'])->group(function () {
     Route::post('/payments/razorpay/return', [CheckoutController::class, 'razorpayReturn'])->name('payments.razorpay.return');
     Route::get('/payments/stripe/return', [CheckoutController::class, 'stripeReturn'])->name('payments.stripe.return');
 });
+
+Route::prefix('driver')->name('driver.')->middleware(['auth', 'active', 'otp', 'driver'])->group(function () {
+    Route::get('/', [DriverController::class, 'dashboard'])->name('dashboard');
+    Route::get('/deliveries/{assignment}', [DriverController::class, 'show'])->name('deliveries.show');
+    Route::post('/deliveries/{assignment}/accept', [DriverController::class, 'accept'])->name('deliveries.accept');
+    Route::post('/deliveries/{assignment}/start', [DriverController::class, 'start'])->name('deliveries.start');
+    Route::post('/deliveries/{assignment}/location', [DriverController::class, 'location'])->middleware('throttle:12,1')->name('deliveries.location');
+    Route::post('/deliveries/{assignment}/complete', [DriverController::class, 'complete'])->name('deliveries.complete');
+});
+
 Route::post('/payments/webhook/{provider}', [CheckoutController::class, 'webhook'])->middleware('throttle:120,1')->name('payments.webhook');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'otp', 'admin'])->group(function () {
@@ -78,6 +90,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'otp', 'ad
     Route::post('/gold-prices/refresh-demo', [AdminGoldPriceController::class, 'refreshDemo'])->name('gold-prices.refresh-demo');
     Route::post('/gold-prices/sync', [AdminGoldPriceController::class, 'sync'])->middleware('throttle:6,1')->name('gold-prices.sync');
     Route::post('/gold-prices/backfill', [AdminGoldPriceController::class, 'backfill'])->middleware('throttle:3,60')->name('gold-prices.backfill');
+    Route::get('/drivers', [AdminDriverController::class, 'index'])->name('drivers.index');
+    Route::post('/drivers', [AdminDriverController::class, 'store'])->name('drivers.store');
+    Route::patch('/drivers/{driver}/toggle', [AdminDriverController::class, 'toggle'])->name('drivers.toggle');
+    Route::post('/shipments/{shipment}/assign', [AdminDriverController::class, 'assign'])->name('shipments.assign');
     Route::resource('products', AdminProductController::class)->except('show');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::patch('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
