@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\GoldPriceController as AdminGoldPriceController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -73,6 +74,10 @@ Route::post('/payments/webhook/{provider}', [CheckoutController::class, 'webhook
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'otp', 'admin'])->group(function () {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
+    Route::get('/gold-prices', [AdminGoldPriceController::class, 'index'])->name('gold-prices.index');
+    Route::post('/gold-prices/refresh-demo', [AdminGoldPriceController::class, 'refreshDemo'])->name('gold-prices.refresh-demo');
+    Route::post('/gold-prices/sync', [AdminGoldPriceController::class, 'sync'])->middleware('throttle:6,1')->name('gold-prices.sync');
+    Route::post('/gold-prices/backfill', [AdminGoldPriceController::class, 'backfill'])->middleware('throttle:3,60')->name('gold-prices.backfill');
     Route::resource('products', AdminProductController::class)->except('show');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::patch('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');

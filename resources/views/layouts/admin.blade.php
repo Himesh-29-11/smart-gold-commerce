@@ -25,6 +25,9 @@
                 <a @class(['active' => request()->routeIs('admin.products.*')]) href="{{ route('admin.products.index') }}">
                     <i aria-hidden="true">◇</i><span>Products</span>
                 </a>
+                <a @class(['active' => request()->routeIs('admin.gold-prices.*')]) href="{{ route('admin.gold-prices.index') }}">
+                    <i aria-hidden="true">◉</i><span>Gold-rate feed</span>
+                </a>
                 <a @class(['active' => request()->routeIs('admin.orders.*')]) href="{{ route('admin.orders.index') }}">
                     <i aria-hidden="true">▤</i><span>Orders</span>
                 </a>
