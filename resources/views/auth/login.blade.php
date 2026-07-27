@@ -55,6 +55,8 @@
                     @enderror
                 </label>
 
+                <div class="form-row-between"><span></span><a href="{{ route('password.request') }}">Forgot password?</a></div>
+
                 <label class="check">
                     <input type="checkbox" name="remember">
                     <span>Keep me signed in on this device</span>

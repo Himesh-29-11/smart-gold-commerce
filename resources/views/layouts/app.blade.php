@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="trust-strip"><span>✦ BIS certification details</span><span>↻ Market-linked prices</span><span>⌁ Secure
             payments</span><span>✓ Verified partners only</span></div>
     <header class="site-header">
@@ -39,7 +40,7 @@
             @endauth
         </nav>
     </header>
-    <main>
+    <main id="main-content">
         @if (session('success'))
             <div class="flash flash-success" role="status">✓ {{ session('success') }}</div>
         @endif

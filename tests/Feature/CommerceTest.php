@@ -129,6 +129,9 @@ class CommerceTest extends TestCase
             ->assertSee('Create secure account')
             ->assertSee('aria-controls="register-password"', escape: false)
             ->assertSee('aria-controls="register-password-confirmation"', escape: false);
+        $this->get(route('password.request'))->assertOk()->assertSee('Reset your password');
+        $this->get(route('password.reset', ['token' => 'test-token', 'email' => 'test@example.com']))
+            ->assertOk()->assertSee('Choose a new password');
         $this->get(route('catalog.show', $product))->assertOk()->assertSee($product->name);
         $this->actingAs($customer)->get(route('account.dashboard'))->assertOk()->assertSee('Recent orders');
 
