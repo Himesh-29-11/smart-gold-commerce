@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Jobs\SendNotificationMail;
 use Database\Factories\UserFactory;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -62,6 +64,11 @@ class User extends Authenticatable
     public function isDriver(): bool
     {
         return $this->role === 'driver';
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        SendNotificationMail::dispatch($this, new ResetPassword($token));
     }
 
     public function isAdmin(): bool

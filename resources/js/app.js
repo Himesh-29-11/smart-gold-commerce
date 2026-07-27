@@ -5,6 +5,7 @@ import '../css/forms.css';
 import '../css/admin.css';
 import '../css/tracking.css';
 import '../css/driver.css';
+import '../css/responsive-polish.css';
 import 'leaflet/dist/leaflet.css';
 import Chart from 'chart.js/auto';
 import L from 'leaflet';
@@ -14,7 +15,19 @@ window.L = L;
 
 const navToggle = document.querySelector('[data-nav-toggle]');
 const nav = document.querySelector('[data-nav]');
-navToggle?.addEventListener('click', () => nav?.classList.toggle('open'));
+const setMainNavigation = open => {
+    nav?.classList.toggle('open', open);
+    navToggle?.setAttribute('aria-expanded', open ? 'true' : 'false');
+};
+navToggle?.setAttribute('aria-expanded', 'false');
+navToggle?.addEventListener('click', () => setMainNavigation(!nav?.classList.contains('open')));
+nav?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMainNavigation(false)));
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+        setMainNavigation(false);
+        setAdminNavigation(false);
+    }
+});
 
 const adminSidebar = document.querySelector('[data-admin-sidebar]');
 const adminBackdrop = document.querySelector('[data-admin-nav-close]');

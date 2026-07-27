@@ -10,6 +10,7 @@
     @stack('head')
 </head>
 <body class="admin-body">
+    <a class="skip-link" href="#admin-main-content">Skip to admin content</a>
     <div class="admin-app">
         <aside class="admin-sidebar" data-admin-sidebar>
             <a class="admin-brand" href="{{ route('admin.dashboard') }}">
@@ -67,7 +68,7 @@
                 </div>
             </header>
 
-            <main class="admin-main">
+            <main class="admin-main" id="admin-main-content">
                 @if (session('success'))
                     <div class="admin-alert success" role="status">✓ {{ session('success') }}</div>
                 @endif
