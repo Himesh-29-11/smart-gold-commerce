@@ -21,7 +21,6 @@ class TrackingController extends Controller
         return view('account.tracking', [
             'order' => $order->load('items'),
             'shipment' => $shipment?->load('events'),
-            'googleMapsKey' => config('services.google_maps.key'),
         ]);
     }
 

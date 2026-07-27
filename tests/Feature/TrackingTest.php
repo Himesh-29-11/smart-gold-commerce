@@ -38,7 +38,9 @@ class TrackingTest extends TestCase
             ->get(route('orders.tracking', $order))
             ->assertOk()
             ->assertSee($shipment->tracking_number)
-            ->assertSee('Delivery timeline');
+            ->assertSee('Delivery timeline')
+            ->assertSee('delivery-map', escape: false)
+            ->assertSee('OpenStreetMap');
 
         $this->actingAs($user)
             ->getJson(route('orders.tracking.data', $order))

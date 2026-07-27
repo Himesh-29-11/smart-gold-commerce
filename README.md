@@ -219,13 +219,9 @@ Paid orders receive an internal tracking ID, an in-app payment notification, and
 /account/orders/{order}/tracking
 ```
 
-The tracking page polls a protected JSON endpoint every 30 seconds. Approximate courier coordinates are rounded before they are returned to the browser. Configure a domain-restricted Google Maps browser key only after a contracted courier is permitted to supply location data:
+The tracking page polls a protected JSON endpoint every 30 seconds. Approximate courier coordinates are rounded before they are returned to the browser. The map uses the open-source Leaflet library and OpenStreetMap tiles, so no Google Maps API key or billing account is required for local/light testing. OpenStreetMap attribution is displayed automatically. For commercial high-traffic production, replace the public tile URL with an approved hosted or self-hosted tile provider while keeping Leaflet and the Laravel tracking backend.
 
-```dotenv
-GOOGLE_MAPS_API_KEY=
-```
-
-Without a key or courier coordinates, the page safely falls back to the tracking ID and milestone timeline. `CourierConnector` remains available for a future Shiprocket, Delhivery, Blue Dart, or other approved adapter.
+Without courier coordinates, the page safely falls back to the tracking ID and milestone timeline. `CourierConnector` remains available for a future Shiprocket, Delhivery, Blue Dart, or other approved adapter.
 
 For the own-fleet workflow, administrators create active driver accounts at `/admin/drivers`, assign paid shipments, and drivers sign in at `/driver`. The mobile driver page can accept/start/complete deliveries and uses browser Geolocation to send exact coordinates every 15 seconds while the page remains active. Exact history is restricted to operations; the customer tracking endpoint rounds the latest point to three decimal places. Mobile web location sharing requires HTTPS and generally stops when the browser is closed or suspended; continuous background tracking requires a future native driver app.
 

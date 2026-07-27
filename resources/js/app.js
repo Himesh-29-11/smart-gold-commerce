@@ -5,9 +5,12 @@ import '../css/forms.css';
 import '../css/admin.css';
 import '../css/tracking.css';
 import '../css/driver.css';
+import 'leaflet/dist/leaflet.css';
 import Chart from 'chart.js/auto';
+import L from 'leaflet';
 
 window.Chart = Chart;
+window.L = L;
 
 const navToggle = document.querySelector('[data-nav-toggle]');
 const nav = document.querySelector('[data-nav]');
