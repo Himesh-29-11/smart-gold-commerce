@@ -26,20 +26,53 @@ window.addEventListener('load',()=>{
     let map=null;
     let marker=null;
 
-    const showPoint=point=>{
-        if(!point||!window.L||!mapElement)return;
-        mapElement.hidden=false;
-        if(fallback)fallback.hidden=true;
-        if(!map){
-            map=L.map(mapElement,{zoomControl:true,attributionControl:true}).setView([point.lat,point.lng],14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
-            const scooter=L.divIcon({className:'scooter-map-marker',html:'<span>🛵</span>',iconSize:[44,44],iconAnchor:[22,22]});
-            marker=L.marker([point.lat,point.lng],{icon:scooter,title:'Approximate delivery location'}).addTo(map);
-            window.setTimeout(()=>map.invalidateSize(),100);
-        }else{
-            marker.setLatLng([point.lat,point.lng]);
-            map.panTo([point.lat,point.lng]);
+    const ensureLeaflet=callback=>{
+        if(window.L){
+            callback();
+            return;
         }
+        const onReady=()=>{
+            window.removeEventListener('leaflet:ready',onReady);
+            callback();
+        };
+        window.addEventListener('leaflet:ready',onReady);
+        const interval=window.setInterval(()=>{
+            if(window.L){
+                window.clearInterval(interval);
+                window.removeEventListener('leaflet:ready',onReady);
+                callback();
+            }
+        },25);
+        window.setTimeout(()=>window.clearInterval(interval),10000);
+    };
+
+    const showPoint=point=>{
+        if(!point||!mapElement)return;
+        ensureLeaflet(()=>{
+            const lat=Number(point.lat);
+            const lng=Number(point.lng);
+            if(Number.isNaN(lat)||Number.isNaN(lng))return;
+
+            mapElement.hidden=false;
+            mapElement.removeAttribute('hidden');
+            if(fallback){
+                fallback.hidden=true;
+                fallback.setAttribute('hidden','true');
+            }
+            if(!map){
+                map=L.map(mapElement,{zoomControl:true,attributionControl:true}).setView([lat,lng],14);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors',crossOrigin:true}).addTo(map);
+                const scooter=L.divIcon({className:'scooter-map-marker',html:'<span>🛵</span>',iconSize:[44,44],iconAnchor:[22,22]});
+                marker=L.marker([lat,lng],{icon:scooter,title:'Approximate delivery location'}).addTo(map);
+                window.setTimeout(()=>map?.invalidateSize(),50);
+                window.setTimeout(()=>map?.invalidateSize(),250);
+                window.addEventListener('resize',()=>map?.invalidateSize());
+            }else{
+                marker.setLatLng([lat,lng]);
+                map.panTo([lat,lng]);
+                map.invalidateSize();
+            }
+        });
     };
 
     showPoint(initialPoint);
