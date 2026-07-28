@@ -13,7 +13,9 @@
 
 <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
-    <div class="trust-strip"><span>✦ BIS certification details</span><span>↻ Market-linked prices</span><span>⌁ Secure
+    <div class="trust-strip sparkle">
+        <span class="spark-element"></span><span class="spark-element"></span><span class="spark-element"></span><span class="spark-element"></span><span class="spark-element"></span>
+        <span>✦ BIS certification details</span><span>↻ Market-linked prices</span><span>⌁ Secure
             payments</span><span>✓ Verified partners only</span></div>
     <header class="site-header">
         <a class="brand" href="{{ route('home') }}" aria-label="{{ config('app.name') }} home"><span

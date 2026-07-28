@@ -1,6 +1,6 @@
 :root {
-    --green: #123b32;
-    --green-2: #0a2b25;
+    --green: #4a0404; /* Burgundy */
+    --green-2: #2e0202; /* Deep Burgundy */
     --gold: #b88a38;
     --gold-light: #ddc184;
     --cream: #f7f4ec;
@@ -10,7 +10,7 @@
     --line: #dedfd9;
     --danger: #a33c34;
     --success: #32755c;
-    --shadow: 0 18px 60px rgba(18, 42, 35, .09);
+    --shadow: 0 18px 60px rgba(46, 2, 2, .09);
     --serif: Georgia, 'Times New Roman', serif;
     --sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif
 }
@@ -82,7 +82,7 @@ h3 {
 .trust-strip {
     height: 34px;
     background: var(--green-2);
-    color: #d8e6df;
+    color: #e6d8d8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,7 +150,7 @@ h3 {
 .nav-link {
     font-size: 13px;
     font-weight: 600;
-    color: #3e4a45;
+    color: #4a3e3e;
     background: none;
     border: 0;
     padding: 10px 0
@@ -204,7 +204,7 @@ h3 {
     overflow: hidden;
     z-index: 1;
     transition: all .35s cubic-bezier(.16, 1, .3, 1);
-    box-shadow: 0 4px 15px -2px rgba(18, 59, 50, .22);
+    box-shadow: 0 4px 15px -2px rgba(74, 4, 4, .22);
 }
 
 .button::after,
@@ -235,7 +235,7 @@ h3 {
 .button:hover {
     background: var(--green-2);
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px -4px rgba(18, 59, 50, .36);
+    box-shadow: 0 12px 28px -4px rgba(74, 4, 4, .36);
 }
 
 .button:active,
@@ -267,7 +267,7 @@ h3 {
     background: var(--green);
     color: #fff;
     border-color: var(--green);
-    box-shadow: 0 10px 24px -4px rgba(18, 59, 50, .28);
+    box-shadow: 0 10px 24px -4px rgba(74, 4, 4, .28);
 }
 
 .button-gold {
@@ -323,14 +323,14 @@ h3 {
 }
 
 .flash-success {
-    background: #e7f4ed;
-    color: #245d48;
-    border: 1px solid #bcdacb
+    background: #f4e7e9;
+    color: #5d2424;
+    border: 1px solid #dabcc4
 }
 
 .flash-info {
-    background: #edf4f1;
-    color: #245649
+    background: #f4edf0;
+    color: #56242c
 }
 
 .flash-error {
@@ -365,7 +365,7 @@ h3 {
 .section {
     max-width: 1240px;
     margin: 0 auto;
-    padding: 90px 30px
+    padding: 100px 40px
 }
 
 .section-tint {
@@ -411,7 +411,7 @@ h3 {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(4, 26, 22, .9) 0%, rgba(7, 31, 26, .55) 48%, rgba(5, 21, 18, .1) 75%)
+    background: linear-gradient(90deg, rgba(40, 2, 2, .9) 0%, rgba(50, 2, 2, .55) 48%, rgba(30, 1, 1, .1) 75%)
 }
 
 .hero-content {
@@ -438,7 +438,7 @@ h3 {
 .hero-content>p {
     font-size: 17px;
     max-width: 590px;
-    color: #dfe9e4
+    color: #e9dfdf
 }
 
 .hero-actions {
@@ -498,11 +498,11 @@ h3 {
 }
 
 .up {
-    color: #2e8061 !important
+    color: #802e2e !important
 }
 
 .down {
-    color: #aa4037 !important
+    color: #802e2e !important
 }
 
 .intro {
@@ -530,7 +530,7 @@ h3 {
     overflow: hidden;
     color: #fff;
     border-radius: 16px;
-    box-shadow: 0 14px 35px -6px rgba(18, 42, 35, .15);
+    box-shadow: 0 14px 35px -6px rgba(46, 2, 2, .15);
     transition: all .35s cubic-bezier(.16, 1, .3, 1);
 }
 
@@ -538,13 +538,13 @@ h3 {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(5, 25, 21, .94) 0%, rgba(5, 25, 21, .35) 60%, transparent 100%);
+    background: linear-gradient(0deg, rgba(35, 2, 2, .94) 0%, rgba(35, 2, 2, .35) 60%, transparent 100%);
     transition: background .35s ease;
 }
 
 .category-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 22px 48px -8px rgba(18, 42, 35, .25);
+    box-shadow: 0 22px 48px -8px rgba(46, 2, 2, .25);
 }
 
 .category-card img {
@@ -583,7 +583,7 @@ h3 {
 
 .category-card p {
     font-size: 13px;
-    color: #dfe9e4;
+    color: #e9dfdf;
     margin-bottom: 14px;
     line-height: 1.5;
 }
@@ -611,11 +611,11 @@ h3 {
     display: flex;
     flex-direction: column;
     height: 100%;
-    box-shadow: 0 4px 18px -4px rgba(18, 42, 35, .05);
+    box-shadow: 0 4px 18px -4px rgba(46, 2, 2, .05);
 }
 
 .product-card:hover {
-    box-shadow: 0 18px 40px -10px rgba(18, 42, 35, .14);
+    box-shadow: 0 18px 40px -10px rgba(46, 2, 2, .14);
     transform: translateY(-4px);
     border-color: rgba(184, 138, 56, .35);
 }
@@ -651,7 +651,7 @@ h3 {
     padding: 6px 11px;
     border-left: 3px solid var(--gold);
     border-radius: 0 4px 4px 0;
-    box-shadow: 0 4px 12px rgba(18, 42, 35, .1);
+    box-shadow: 0 4px 12px rgba(46, 2, 2, .1);
     backdrop-filter: blur(6px);
 }
 
@@ -778,7 +778,7 @@ h3 {
 
 .loan-banner {
     min-height: 430px;
-    background: linear-gradient(90deg, rgba(7, 38, 31, .97), rgba(12, 59, 48, .86)), url('/images/hero-gold.jpg') center/cover;
+    background: linear-gradient(90deg, rgba(50, 4, 4, .97), rgba(70, 4, 4, .86)), url('/images/hero-gold.jpg') center/cover;
     color: #fff;
     display: grid;
     place-items: center;
@@ -1251,7 +1251,7 @@ label small {
     border: 1px solid rgba(222, 223, 217, .8);
     border-top: 4px solid var(--gold);
     border-radius: 16px;
-    box-shadow: 0 14px 35px -8px rgba(18, 42, 35, .08);
+    box-shadow: 0 14px 35px -8px rgba(46, 2, 2, .08);
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
@@ -1260,7 +1260,7 @@ label small {
 
 .rate-cards article:hover {
     transform: translateY(-3px);
-    box-shadow: 0 20px 42px -10px rgba(18, 42, 35, .14);
+    box-shadow: 0 20px 42px -10px rgba(46, 2, 2, .14);
 }
 
 .rate-cards article>div {
@@ -1312,7 +1312,7 @@ label small {
     border-radius: 16px;
     padding: 30px;
     background: #fff;
-    box-shadow: 0 10px 30px -8px rgba(18, 42, 35, .06);
+    box-shadow: 0 10px 30px -8px rgba(46, 2, 2, .06);
 }
 
 .chart-box {
@@ -1406,7 +1406,7 @@ label small {
 }
 
 .loan-hero {
-    background: linear-gradient(110deg, rgba(8, 40, 33, .96), rgba(19, 70, 58, .89)), url('/images/hero-gold.jpg') center/cover
+    background: linear-gradient(110deg, rgba(55, 3, 3, .96), rgba(80, 5, 5, .89)), url('/images/hero-gold.jpg') center/cover
 }
 
 .loan-calculator {
@@ -1708,7 +1708,7 @@ input[type=range] {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(5, 30, 25, .92), rgba(5, 30, 25, .12))
+    background: linear-gradient(0deg, rgba(40, 2, 2, .92), rgba(40, 2, 2, .12))
 }
 
 .auth-art img {
@@ -3097,3 +3097,35 @@ input[type=range] {
     object-fit: cover;
     background: #0a2b25
 }
+
+
+/* --- Sparks Animation --- */
+@keyframes floating-spark {
+    0% { transform: translateY(0) scale(1); opacity: 0; }
+    20% { opacity: 1; transform: translateY(-5px) scale(1.2); box-shadow: 0 0 10px var(--gold-light); }
+    80% { opacity: 1; transform: translateY(-20px) scale(0.9); box-shadow: 0 0 2px var(--gold-light); }
+    100% { transform: translateY(-25px) scale(0.5); opacity: 0; }
+}
+
+.sparkle {
+    position: relative;
+    overflow: hidden;
+}
+
+.spark-element {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: var(--gold-light);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    animation: floating-spark 3s infinite ease-in-out;
+}
+
+.spark-element:nth-child(1) { left: 10%; top: 80%; animation-delay: 0s; animation-duration: 4s; }
+.spark-element:nth-child(2) { left: 30%; top: 70%; animation-delay: 1.2s; animation-duration: 3s; }
+.spark-element:nth-child(3) { left: 50%; top: 90%; animation-delay: 0.5s; animation-duration: 4.5s; }
+.spark-element:nth-child(4) { left: 70%; top: 75%; animation-delay: 2s; animation-duration: 3.5s; }
+.spark-element:nth-child(5) { left: 90%; top: 85%; animation-delay: 0.8s; animation-duration: 3.8s; }

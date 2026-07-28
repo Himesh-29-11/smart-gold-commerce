@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('title', 'Certified Gold, Clearly Priced')
 @section('content')
-    <section class="hero">
+    <section class="hero sparkle">
+        <span class="spark-element"></span><span class="spark-element"></span><span class="spark-element"></span><span class="spark-element"></span><span class="spark-element"></span>
         <img class="hero-media" src="{{ asset('images/hero-gold.jpg') }}" alt="Certified gold coins and jewellery">
         <div class="hero-overlay"></div>
         <div class="hero-content"><span class="kicker">A more considered way to buy gold</span>
