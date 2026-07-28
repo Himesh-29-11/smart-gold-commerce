@@ -109,7 +109,8 @@
             </div>@endauth
         </div>
     </section>
-    @auth@if ($requests->count())
+    @auth
+        @if ($requests->count())
             <section class="section section-tint"><span class="kicker dark">Your requests</span>
                 <h2>Approval status tracking</h2>
                 <div class="status-list">
@@ -124,5 +125,6 @@
                     @endforeach
                 </div>
             </section>
-        @endif@endauth
+        @endif
+    @endauth
     @endsection
