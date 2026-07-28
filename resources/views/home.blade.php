@@ -46,19 +46,24 @@
             </div><a class="text-link" href="{{ route('catalog.index') }}">View all products →</a>
         </div>
         @php
-            // Get unique weights from the featured products
             $availableWeights = $products->pluck('weight_grams')->map(fn($w) => round($w))->unique()->sort()->values();
         @endphp
-        <div style="display: flex; gap: 10px; margin-bottom: 30px; justify-content: center; flex-wrap: wrap;">
-            @foreach($availableWeights as $index => $weight)
-                <button type="button" class="button {{ $index === 0 ? 'button-gold' : 'button-outline' }} weight-filter-btn" data-weight="{{ $weight }}">
-                    {{ $weight }}g
+        <div style="display: flex; gap: 10px; margin-bottom: 36px; justify-content: center; flex-wrap: wrap;">
+            <button type="button" class="button button-gold weight-filter-btn" data-weight="all" style="border-radius: 999px;">
+                All collection ({{ $products->count() }})
+            </button>
+            @foreach($availableWeights as $weight)
+                @php
+                    $count = $products->filter(fn($p) => round($p->weight_grams) == $weight)->count();
+                @endphp
+                <button type="button" class="button button-outline weight-filter-btn" data-weight="{{ $weight }}" style="border-radius: 999px;">
+                    {{ $weight }}g ({{ $count }})
                 </button>
             @endforeach
         </div>
-        <div class="product-grid" style="display: flex; justify-content: center;">
-            @foreach ($products as $index => $product)
-                <div class="product-wrapper" data-weight="{{ round($product->weight_grams) }}" style="max-width: 320px; width: 100%; display: {{ $index === 0 ? 'block' : 'none' }};">
+        <div class="product-grid">
+            @foreach ($products as $product)
+                <div class="product-wrapper" data-weight="{{ round($product->weight_grams) }}">
                     <x-product-card :product="$product" :price-service="$priceService" />
                 </div>
             @endforeach
@@ -72,7 +77,6 @@
 
                 buttons.forEach(btn => {
                     btn.addEventListener('click', function() {
-                        // Update button styles
                         buttons.forEach(b => {
                             b.classList.remove('button-gold');
                             b.classList.add('button-outline');
@@ -81,13 +85,9 @@
                         this.classList.add('button-gold');
 
                         const selectedWeight = this.getAttribute('data-weight');
-                        
-                        // Show ONLY the first product that matches the weight
-                        let found = false;
                         wrappers.forEach(wrap => {
-                            if (!found && wrap.getAttribute('data-weight') === selectedWeight) {
-                                wrap.style.display = 'block';
-                                found = true;
+                            if (selectedWeight === 'all' || wrap.getAttribute('data-weight') === selectedWeight) {
+                                wrap.style.display = '';
                             } else {
                                 wrap.style.display = 'none';
                             }
