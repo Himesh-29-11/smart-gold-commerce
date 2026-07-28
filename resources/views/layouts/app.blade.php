@@ -37,7 +37,7 @@
                 <form method="POST" action="{{ route('logout') }}">@csrf<button class="nav-link" type="submit">Sign
                         out</button></form>
             @else
-                <a href="{{ route('login') }}">Sign in</a><a class="button button-sm"
+                <a href="{{ route('login') }}">Sign in</a><a class="button button-sm button-gold"
                     href="{{ route('register') }}">Create account</a>
             @endauth
         </nav>

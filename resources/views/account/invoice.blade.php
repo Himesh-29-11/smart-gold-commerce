@@ -31,7 +31,7 @@
         .brand {
             font-size: 26px;
             letter-spacing: 4px;
-            color: #173c34
+            color: #4a0404
         }
 
         .brand small {
@@ -106,7 +106,7 @@
 
         .totals .grand {
             font-size: 20px;
-            border-top: 2px solid #173c34;
+            border-top: 2px solid #4a0404;
             margin-top: 8px;
             padding-top: 14px
         }
@@ -123,7 +123,7 @@
             display: block;
             margin: 20px auto;
             padding: 12px 25px;
-            background: #173c34;
+            background: #4a0404;
             color: #fff;
             border: 0;
             border-radius: 4px

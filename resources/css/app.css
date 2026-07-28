@@ -146,7 +146,7 @@ h3 {
     gap: 26px
 }
 
-.main-nav>a,
+.main-nav>a:not(.button),
 .nav-link {
     font-size: 13px;
     font-weight: 600;
@@ -156,7 +156,7 @@ h3 {
     padding: 10px 0
 }
 
-.main-nav>a.active {
+.main-nav>a:not(.button).active {
     color: var(--gold)
 }
 
@@ -411,7 +411,7 @@ h3 {
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(40, 2, 2, .9) 0%, rgba(50, 2, 2, .55) 48%, rgba(30, 1, 1, .1) 75%)
+    background: linear-gradient(90deg, rgba(20, 5, 5, .9) 0%, rgba(20, 5, 5, .6) 48%, rgba(20, 5, 5, .15) 75%)
 }
 
 .hero-content {
@@ -498,11 +498,11 @@ h3 {
 }
 
 .up {
-    color: #802e2e !important
+    color: #2e8061 !important
 }
 
 .down {
-    color: #802e2e !important
+    color: #aa4037 !important
 }
 
 .intro {
@@ -538,7 +538,7 @@ h3 {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(35, 2, 2, .94) 0%, rgba(35, 2, 2, .35) 60%, transparent 100%);
+    background: linear-gradient(0deg, rgba(20, 5, 5, .95) 0%, rgba(20, 5, 5, .4) 60%, transparent 100%);
     transition: background .35s ease;
 }
 
