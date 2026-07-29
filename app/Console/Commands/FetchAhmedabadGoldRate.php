@@ -22,16 +22,18 @@ class FetchAhmedabadGoldRate extends Command
                 ['Carat', 'Price / gram (INR)', 'Market Change', 'Source', 'Fetched At'],
                 $rates->map(fn ($r) => [
                     $r->carat,
-                    '₹' . number_format($r->price_per_gram, 2),
-                    ($r->market_change >= 0 ? '+' : '') . '₹' . number_format($r->market_change, 2),
+                    '₹'.number_format($r->price_per_gram, 2),
+                    ($r->market_change >= 0 ? '+' : '').'₹'.number_format($r->market_change, 2),
                     $r->source,
                     $r->fetched_at->format('Y-m-d H:i:s'),
                 ])
             );
             $this->info('Successfully synchronized Ahmedabad Sarafa Bazaar gold rates!');
+
             return self::SUCCESS;
         } catch (\Throwable $e) {
-            $this->error('Failed to fetch Ahmedabad bullion rates: ' . $e->getMessage());
+            $this->error('Failed to fetch Ahmedabad bullion rates: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }
