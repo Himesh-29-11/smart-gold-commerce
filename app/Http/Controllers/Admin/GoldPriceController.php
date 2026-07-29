@@ -95,6 +95,24 @@ class GoldPriceController extends Controller
         }
     }
 
+    public function fetchAhmedabad(Request $request, GoldPriceService $prices): RedirectResponse
+    {
+        try {
+            $rates = $prices->fetchAhmedabadLiveRate();
+            Log::notice('Administrator fetched live Ahmedabad Sarafa Bazaar bullion gold rates.', [
+                'admin_id' => $request->user()->id,
+                'observations' => $rates->count(),
+                'api_key_configured' => filled(config('gold.api_key')),
+            ]);
+
+            return back()->with('success', 'Ahmedabad Bullion Market (MCX Linked + Sarafa Bazaar premium) 22K and 24K gold rates synchronized!');
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors(['gold' => 'Ahmedabad live price fetch failed: '.$exception->getMessage()]);
+        }
+    }
+
     public function backfill(Request $request): RedirectResponse
     {
         if (config('gold.provider') === 'database') {

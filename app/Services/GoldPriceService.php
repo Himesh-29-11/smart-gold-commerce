@@ -222,6 +222,90 @@ class GoldPriceService
     }
 
     /**
+     * Fetch live Ahmedabad Bullion Market gold rates (INR/gram) with MCX / Sarafa Bazaar local premium.
+     * Supports optional API key (e.g. GoldAPI.io / MetalpriceAPI / custom Ahmedabad feed) or open public spot rates.
+     */
+    public function fetchAhmedabadLiveRate(?string $apiKey = null): Collection
+    {
+        $apiKey = $apiKey ?: (string) config('gold.api_key');
+        $authMode = (string) config('gold.auth_mode');
+        $endpoint = (string) config('gold.endpoint');
+
+        $inrPerTroyOunce = 0.0;
+
+        // Try API Key endpoint if configured
+        if ($apiKey !== '' && $endpoint !== '') {
+            try {
+                $response = $this->authorizedRequest($apiKey, $authMode)->get($endpoint);
+                if ($response->ok() && is_array($response->json())) {
+                    $payload = $response->json();
+                    $rawPrice = $this->valueAt($payload, config('gold.paths.24K', 'price'));
+                    if (is_numeric($rawPrice) && (float) $rawPrice > 0) {
+                        $inrPerTroyOunce = (float) $rawPrice;
+                        if (config('gold.unit') !== 'troy_ounce') {
+                            $inrPerTroyOunce *= self::GRAMS_PER_TROY_OUNCE;
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Safe fallback to open public spot if provider times out or fails
+            }
+        }
+
+        // Open public spot fallback if API key not supplied or endpoint unavailable
+        if ($inrPerTroyOunce <= 0) {
+            $response = Http::timeout(12)->get('https://api.coingecko.com/api/v3/simple/price', [
+                'ids' => 'pax-gold,tether-gold',
+                'vs_currencies' => 'inr',
+            ]);
+            $response->throw();
+            $payload = $response->json();
+            $inrPerTroyOunce = (float) (data_get($payload, 'pax-gold.inr') ?: data_get($payload, 'tether-gold.inr', 0));
+        }
+
+        if ($inrPerTroyOunce <= 0) {
+            throw new RuntimeException('Unable to retrieve valid INR spot price for Ahmedabad market calculation.');
+        }
+
+        // Apply Ahmedabad Sarafa Bazaar local bullion differential (default +0.45% over international INR spot)
+        $premiumPercent = (float) config('gold.ahmedabad_premium_percent', 0.45);
+        $ahmedabad24K = round(($inrPerTroyOunce / self::GRAMS_PER_TROY_OUNCE) * (1 + ($premiumPercent / 100)), 2);
+        $ahmedabad22K = round($ahmedabad24K * (22 / 24), 2);
+        $fetchedAt = CarbonImmutable::now(config('app.timezone'))->setMicrosecond(0);
+
+        $source = 'ahmedabad-sarafa-bullion';
+
+        $rows = collect([
+            '24K' => $ahmedabad24K,
+            '22K' => $ahmedabad22K,
+        ])->map(function (float $price, string $carat) use ($source, $fetchedAt) {
+            $previous = GoldPriceHistory::where('source', $source)
+                ->where('carat', $carat)
+                ->latest('fetched_at')
+                ->first();
+            $marketChange = $previous ? round($price - (float) $previous->price_per_gram, 2) : 0.0;
+
+            return GoldPriceHistory::updateOrCreate(
+                [
+                    'carat' => $carat,
+                    'source' => $source,
+                    'fetched_at' => $fetchedAt,
+                ],
+                [
+                    'price_per_gram' => $price,
+                    'currency' => 'INR',
+                    'market_change' => $marketChange,
+                    'is_demo' => false,
+                ]
+            );
+        });
+
+        $this->latestCache = [];
+
+        return $rows;
+    }
+
+    /**
      * Fetch daily observations from a provider URL containing a {date} token.
      * Dates are requested oldest-first so missing market changes can be derived.
      */

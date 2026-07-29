@@ -15,6 +15,7 @@ return [
     'api_key_prefix' => env('GOLD_PRICE_API_KEY_PREFIX', ''),
     'currency' => env('GOLD_PRICE_CURRENCY', 'INR'),
     'unit' => env('GOLD_PRICE_API_UNIT', 'gram'), // gram or troy_ounce
+    'ahmedabad_premium_percent' => (float) env('GOLD_PRICE_AHMEDABAD_PREMIUM', 0.45), // Ahmedabad Sarafa Bazaar local differential % over international spot
     'timeout' => (int) env('GOLD_PRICE_API_TIMEOUT', 10),
     'history_date_format' => env('GOLD_PRICE_HISTORY_DATE_FORMAT', 'Y-m-d'),
     'paths' => [

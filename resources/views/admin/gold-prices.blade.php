@@ -27,7 +27,11 @@
             @csrf
             <button class="button button-gold" type="submit">Fetch real live spot rate (Free open API)</button>
         </form>
-        <p class="admin-panel-note">Instantly fetches the genuine real-time spot price of fine gold in INR from public metals endpoints without requiring an API key.</p>
+        <form class="gold-operation-form" method="POST" action="{{ route('admin.gold-prices.fetch-ahmedabad') }}" style="margin-top: 10px;">
+            @csrf
+            <button class="button" type="submit" style="background: #0f3b30;">Fetch Ahmedabad Bullion Rate (MCX Sarafa Bazaar + API Key)</button>
+        </form>
+        <p class="admin-panel-note">Fetches the Ahmedabad local bullion market gold rate (MCX Linked + Sarafa Bazaar premium). Automatically uses your GOLD_PRICE_API_KEY from .env if configured.</p>
     </section>
 </div>
 

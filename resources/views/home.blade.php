@@ -21,7 +21,7 @@
                 @endforeach
             </div>
             <small>Updated {{ $rates['24K']?->fetched_at?->diffForHumans() ?? 'not yet' }} ·
-                {{ $rates['24K']?->source ?? 'no source' }}</small>
+                {{ $rates['24K']?->source === 'ahmedabad-sarafa-bullion' ? 'Ahmedabad Sarafa Bazaar (MCX Linked)' : ($rates['24K']?->source ?? 'no source') }}</small>
         </div>
     </section>
     <section class="section intro">

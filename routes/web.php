@@ -95,6 +95,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'otp', 'ad
     Route::get('/gold-prices', [AdminGoldPriceController::class, 'index'])->name('gold-prices.index');
     Route::post('/gold-prices/refresh-demo', [AdminGoldPriceController::class, 'refreshDemo'])->name('gold-prices.refresh-demo');
     Route::post('/gold-prices/fetch-public-real', [AdminGoldPriceController::class, 'fetchPublicReal'])->middleware('throttle:10,1')->name('gold-prices.fetch-public-real');
+    Route::post('/gold-prices/fetch-ahmedabad', [AdminGoldPriceController::class, 'fetchAhmedabad'])->middleware('throttle:10,1')->name('gold-prices.fetch-ahmedabad');
     Route::post('/gold-prices/sync', [AdminGoldPriceController::class, 'sync'])->middleware('throttle:6,1')->name('gold-prices.sync');
     Route::post('/gold-prices/backfill', [AdminGoldPriceController::class, 'backfill'])->middleware('throttle:3,60')->name('gold-prices.backfill');
     Route::get('/drivers', [AdminDriverController::class, 'index'])->name('drivers.index');
