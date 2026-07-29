@@ -78,6 +78,23 @@ class GoldPriceController extends Controller
         }
     }
 
+    public function fetchPublicReal(Request $request, GoldPriceService $prices): RedirectResponse
+    {
+        try {
+            $rates = $prices->fetchLivePublicSpotRate();
+            Log::notice('Administrator fetched real live spot gold price from open public API.', [
+                'admin_id' => $request->user()->id,
+                'observations' => $rates->count(),
+            ]);
+
+            return back()->with('success', 'Real live 22K and 24K Indian market gold spot rates synchronized from free open public API.');
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return back()->withErrors(['gold' => 'Real live price fetch failed: '.$exception->getMessage()]);
+        }
+    }
+
     public function backfill(Request $request): RedirectResponse
     {
         if (config('gold.provider') === 'database') {

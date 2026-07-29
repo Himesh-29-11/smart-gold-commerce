@@ -43,8 +43,15 @@ class DemoGoldPriceService
         for ($offset = $days - 1; $offset >= 0; $offset--) {
             $date = $today->subDays($offset);
             $ordinal = $origin->diffInDays($date, false);
-            $seasonal = sin($ordinal / 13) * 135 + cos($ordinal / 31) * 90;
-            $price24K = round(9000 + ($ordinal * 5.15) + $seasonal, 2);
+            
+            // Realistic financial market random-walk volatility with multi-frequency bullion cycles
+            $hash = md5($date->format('Y-m-d'));
+            $volatilityNoise = ((hexdec(substr($hash, 0, 4)) % 1000) / 1000 - 0.48) * 125.0; // daily fluctuation between -₹60 and +₹65
+            $macroWave = sin($ordinal / 18.5) * 210.0 + cos($ordinal / 7.2) * 95.0 + sin($ordinal / 41.0) * 310.0;
+            
+            // Base Indian 24K spot price per gram in INR (~10,800 up to ~12,385 INR/g)
+            $price24K = round(10650 + ($ordinal * 4.65) + $macroWave + $volatilityNoise, 2);
+            $price24K = max(9500, min($price24K, 14800));
             $prices = [
                 '24K' => $price24K,
                 '22K' => round($price24K * (22 / 24), 2),

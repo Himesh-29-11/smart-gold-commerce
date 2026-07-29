@@ -168,6 +168,60 @@ class GoldPriceService
     }
 
     /**
+     * Fetch real-time live Indian market gold rates (INR/gram) from free open public APIs.
+     * Uses open PAXG/INR spot rates (1 PAXG = 1 fine troy ounce gold) without requiring any API key.
+     */
+    public function fetchLivePublicSpotRate(): Collection
+    {
+        $response = Http::timeout(12)->get('https://api.coingecko.com/api/v3/simple/price', [
+            'ids' => 'pax-gold,tether-gold',
+            'vs_currencies' => 'inr',
+        ]);
+        $response->throw();
+
+        $payload = $response->json();
+        $inrPerTroyOunce = (float) (data_get($payload, 'pax-gold.inr') ?: data_get($payload, 'tether-gold.inr', 0));
+        if ($inrPerTroyOunce <= 0) {
+            throw new RuntimeException('Unable to retrieve valid INR spot price from the open public API.');
+        }
+
+        $price24K = round($inrPerTroyOunce / self::GRAMS_PER_TROY_OUNCE, 2);
+        $price22K = round($price24K * (22 / 24), 2);
+        $fetchedAt = CarbonImmutable::now(config('app.timezone'))->setMicrosecond(0);
+
+        $source = config('gold.provider') === 'database' ? DemoGoldPriceService::SOURCE : 'open-public-api';
+
+        $rows = collect([
+            '24K' => $price24K,
+            '22K' => $price22K,
+        ])->map(function (float $price, string $carat) use ($source, $fetchedAt) {
+            $previous = GoldPriceHistory::where('source', $source)
+                ->where('carat', $carat)
+                ->latest('fetched_at')
+                ->first();
+            $marketChange = $previous ? round($price - (float) $previous->price_per_gram, 2) : 0.0;
+
+            return GoldPriceHistory::updateOrCreate(
+                [
+                    'carat' => $carat,
+                    'source' => $source,
+                    'fetched_at' => $fetchedAt,
+                ],
+                [
+                    'price_per_gram' => $price,
+                    'currency' => 'INR',
+                    'market_change' => $marketChange,
+                    'is_demo' => false,
+                ]
+            );
+        });
+
+        $this->latestCache = [];
+
+        return $rows;
+    }
+
+    /**
      * Fetch daily observations from a provider URL containing a {date} token.
      * Dates are requested oldest-first so missing market changes can be derived.
      */

@@ -22,6 +22,12 @@
             <form class="gold-operation-form" method="POST" action="{{ route('admin.gold-prices.sync') }}">@csrf<button class="button" type="submit">Synchronize latest rates now</button></form>
             <form class="gold-operation-form" method="POST" action="{{ route('admin.gold-prices.backfill') }}">@csrf<label>Historical days<input type="number" name="days" min="1" max="365" value="30" required></label><button class="button button-outline" type="submit">Queue historical backfill</button></form><p class="admin-panel-note">Backfill runs on the default queue. Keep the queue worker active and review failed jobs if the provider rejects a request.</p>
         @endif
+
+        <form class="gold-operation-form" method="POST" action="{{ route('admin.gold-prices.fetch-public-real') }}" style="margin-top: 15px; border-top: 1px solid var(--line); padding-top: 15px;">
+            @csrf
+            <button class="button button-gold" type="submit">Fetch real live spot rate (Free open API)</button>
+        </form>
+        <p class="admin-panel-note">Instantly fetches the genuine real-time spot price of fine gold in INR from public metals endpoints without requiring an API key.</p>
     </section>
 </div>
 
