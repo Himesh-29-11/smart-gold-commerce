@@ -23,7 +23,8 @@ class CustomerController extends Controller
             $query->where(fn ($builder) => $builder
                 ->where('name', 'like', '%'.$search.'%')
                 ->orWhere('email', 'like', '%'.$search.'%')
-                ->orWhere('phone', 'like', '%'.$search.'%'));
+                ->orWhere('phone', 'like', '%'.$search.'%')
+                ->orWhere('customer_code', 'like', '%'.$search.'%'));
         }
         if (($data['access'] ?? null) === 'active') {
             $query->where('is_active', true);

@@ -35,6 +35,13 @@
                 <a @class(['active' => request()->routeIs('admin.customers.*')]) href="{{ route('admin.customers.index') }}">
                     <i aria-hidden="true">♙</i><span>Customers</span>
                 </a>
+                <a @class(['active' => request()->routeIs('admin.issues.*')]) href="{{ route('admin.issues.index') }}">
+                    <i aria-hidden="true">✉</i><span>Customer issues</span>
+                    @php $unreadIssues = \App\Models\CustomerIssue::where('status', 'open')->count(); @endphp
+                    @if($unreadIssues > 0)
+                        <span class="badge" style="background: #b88a38; color: #fff; margin-left: auto; padding: 2px 6px; border-radius: 999px; font-size: 10px;">{{ $unreadIssues }}</span>
+                    @endif
+                </a>
                 <a @class(['active' => request()->routeIs('admin.loans.*')]) href="{{ route('admin.loans.index') }}">
                     <i aria-hidden="true">₹</i><span>Loan requests</span>
                 </a>

@@ -18,8 +18,8 @@
             <div class="table-row table-head"><span>Order</span><span>Customer</span><span>Total</span><span>Payment</span><span>Fulfilment</span><span>Update</span></div>
             @forelse ($orders as $order)
                 <div class="table-row">
-                    <span><a href="{{ route('orders.show', $order) }}"><b>{{ $order->reference }}</b></a><small>{{ $order->created_at->format('d M Y, h:i A') }}</small></span>
-                    <span><b>{{ $order->user->name }}</b><small>{{ $order->user->email }}</small></span>
+                    <span><a href="{{ route('orders.show', $order) }}"><b>#{{ $order->order_code ?? substr($order->reference, 4) }} ({{ $order->reference }})</b></a><small>{{ $order->created_at->format('d M Y, h:i A') }}</small></span>
+                    <span><b>#{{ $order->user->customer_code ?? $order->user->id }} — {{ $order->user->name }}</b><small>{{ $order->user->email }}</small></span>
                     <span><b>₹{{ number_format($order->total, 2) }}</b></span>
                     <span class="status status-{{ $order->payment_status }}">{{ $order->payment_status }}</span>
                     <span class="status status-{{ $order->status }}">{{ str_replace('_', ' ', $order->status) }}</span>

@@ -16,9 +16,19 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'phone', 'password', 'role', 'is_active', 'otp_verified_at', 'email_verified_at', 'last_login_at'];
+    protected $fillable = ['customer_code', 'name', 'email', 'phone', 'password', 'role', 'is_active', 'otp_verified_at', 'email_verified_at', 'last_login_at'];
 
     protected $hidden = ['password', 'remember_token'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user): void {
+            if (empty($user->customer_code)) {
+                $max = (int) static::max('customer_code');
+                $user->customer_code = max(1001, $max + 1);
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -69,6 +79,11 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token): void
     {
         SendNotificationMail::dispatch($this, new ResetPassword($token));
+    }
+
+    public function customerIssues(): HasMany
+    {
+        return $this->hasMany(CustomerIssue::class);
     }
 
     public function isAdmin(): bool

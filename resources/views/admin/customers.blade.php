@@ -15,7 +15,7 @@
             <div class="table-row table-head"><span>Customer</span><span>Verified</span><span>Orders</span><span>Loans</span><span>Joined</span><span>Access</span></div>
             @forelse ($customers as $customer)
                 <div class="table-row">
-                    <span><b>{{ $customer->name }}</b><small>{{ $customer->email }} · {{ $customer->phone ?: 'No phone' }}</small></span>
+                    <span><b>#{{ $customer->customer_code ?? $customer->id }} — {{ $customer->name }}</b><small>{{ $customer->email }} · {{ $customer->phone ?: 'No phone' }}</small></span>
                     <span class="status {{ $customer->otp_verified_at ? 'status-confirmed' : 'status-pending' }}">{{ $customer->otp_verified_at ? 'Verified' : 'Pending' }}</span>
                     <span><b>{{ $customer->orders_count }}</b></span><span><b>{{ $customer->loan_requests_count }}</b></span><span><b>{{ $customer->created_at->format('d M Y') }}</b></span>
                     <form method="POST" action="{{ route('admin.customers.toggle', $customer) }}" onsubmit="return confirm('{{ $customer->is_active ? 'Disable' : 'Enable' }} this customer account?')">@csrf @method('PATCH')<button class="{{ $customer->is_active ? 'danger-link' : 'success-link' }}" type="submit">{{ $customer->is_active ? 'Disable' : 'Enable' }}</button></form>
