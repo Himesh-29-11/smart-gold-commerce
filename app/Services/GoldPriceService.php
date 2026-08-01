@@ -211,7 +211,6 @@ class GoldPriceService
                     'price_per_gram' => $price,
                     'currency' => 'INR',
                     'market_change' => $marketChange,
-                    'is_demo' => false,
                 ]
             );
         });
@@ -308,7 +307,6 @@ class GoldPriceService
                     'price_per_gram' => $price,
                     'currency' => 'INR',
                     'market_change' => $marketChange,
-                    'is_demo' => false,
                 ]
             );
         });
@@ -354,7 +352,6 @@ class GoldPriceService
                 'market_change' => round($volatilityNoise, 2),
                 'source' => $source,
                 'fetched_at' => $date->setTime(18, 0),
-                'is_demo' => false,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
@@ -365,7 +362,6 @@ class GoldPriceService
                 'market_change' => round($volatilityNoise * (22 / 24), 2),
                 'source' => $source,
                 'fetched_at' => $date->setTime(18, 0),
-                'is_demo' => false,
                 'created_at' => $now,
                 'updated_at' => $now,
             ];
