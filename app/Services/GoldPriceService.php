@@ -234,18 +234,30 @@ class GoldPriceService
 
         $inrPerTroyOunce = 0.0;
 
-        // Try API Key endpoint if configured
-        if ($apiKey !== '' && $endpoint !== '') {
+        // Auto-detect GoldAPI.io / MetalpriceAPI / Custom endpoint when API key is present
+        if ($apiKey !== '') {
+            $url = $endpoint !== '' ? $endpoint : 'https://www.goldapi.io/api/XAU/INR';
             try {
-                $response = $this->authorizedRequest($apiKey, $authMode)->get($endpoint);
+                $response = Http::timeout(12)
+                    ->withHeaders([
+                        'x-access-token' => $apiKey,
+                        'X-API-Key' => $apiKey,
+                        'Authorization' => 'Bearer '.$apiKey,
+                    ])
+                    ->get($url);
+
                 if ($response->ok() && is_array($response->json())) {
                     $payload = $response->json();
-                    $rawPrice = $this->valueAt($payload, config('gold.paths.24K', 'price'));
+                    $rawPrice = $this->valueAt($payload, config('gold.paths.24K', 'price'))
+                        ?: ($payload['price'] ?? ($payload['rates']['INR'] ?? ($payload['rates']['XAU'] ?? null)));
+
                     if (is_numeric($rawPrice) && (float) $rawPrice > 0) {
-                        $inrPerTroyOunce = (float) $rawPrice;
-                        if (config('gold.unit') !== 'troy_ounce') {
-                            $inrPerTroyOunce *= self::GRAMS_PER_TROY_OUNCE;
+                        $priceVal = (float) $rawPrice;
+                        // Auto-detect troy ounce quotation in INR (> 50,000 INR indicates per troy ounce)
+                        if ($priceVal > 50000.0 || config('gold.unit') === 'troy_ounce') {
+                            $priceVal /= self::GRAMS_PER_TROY_OUNCE;
                         }
+                        $inrPerTroyOunce = $priceVal * self::GRAMS_PER_TROY_OUNCE;
                     }
                 }
             } catch (\Throwable $e) {
