@@ -30,10 +30,11 @@ class GoldPriceController extends Controller
             'coverageTo' => $observations->last()?->fetched_at,
             'points' => $history->map->count(),
             'provider' => config('gold.provider'),
+            'apiKeyConfigured' => filled(config('gold.api_key')),
+            'ahmedabadPremium' => (float) config('gold.ahmedabad_premium_percent', 0.45),
             'latestEndpointConfigured' => filled(config('gold.endpoint')),
             'historyEndpointConfigured' => filled(config('gold.history_endpoint')),
-            'recentObservations' => GoldPriceHistory::when($source, fn ($query) => $query->where('source', $source))
-                ->latest('fetched_at')->limit(12)->get(),
+            'recentObservations' => GoldPriceHistory::latest('fetched_at')->limit(15)->get(),
             'queuedJobs' => DB::table('jobs')->count(),
             'failedJobs' => DB::table('failed_jobs')->count(),
         ]);
