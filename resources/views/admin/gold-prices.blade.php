@@ -31,7 +31,7 @@
             @csrf
             <button class="button" type="submit" style="background: #0f3b30;">Fetch Ahmedabad Bullion Rate (MCX Sarafa Bazaar + API Key)</button>
         </form>
-        <p class="admin-panel-note">Fetches the Ahmedabad local bullion market gold rate (MCX Linked + Sarafa Bazaar premium). Automatically uses your GOLD_PRICE_API_KEY from .env if configured.</p>
+        <p class="admin-panel-note">Fetches the Ahmedabad local bullion market gold rate (MCX Linked + Sarafa Bazaar premium). </p>
     </section>
 </div>
 
