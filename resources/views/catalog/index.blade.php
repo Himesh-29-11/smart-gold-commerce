@@ -25,7 +25,7 @@
 <section class="catalog-page tanishq-inspired-catalog">
     <div class="collection-toolbar">
         <div><strong>All products</strong><span>{{ number_format($products->total()) }} results</span></div>
-        <details class="catalog-filter-drawer" @if($activeFilters->isNotEmpty()) open @endif>
+        <details class="catalog-filter-drawer">
             <summary><span>☷</span> Filter & sort @if($activeFilters->count())<b>{{ $activeFilters->count() }}</b>@endif</summary>
             <div class="filter-drawer-panel">
                 <form method="GET" action="{{ route('catalog.index') }}">
@@ -34,7 +34,11 @@
                     <label>Purity<select name="purity"><option value="">All purities</option><option value="22K" @selected(request('purity')==='22K')>22K gold</option><option value="24K" @selected(request('purity')==='24K')>24K gold</option></select></label>
                     <label>Weight<select name="weight"><option value="">Any weight</option><option value="under-5" @selected(request('weight')==='under-5')>Under 5g</option><option value="5-20" @selected(request('weight')==='5-20')>5g–20g</option><option value="over-20" @selected(request('weight')==='over-20')>Over 20g</option></select></label>
                     <label>Sort by<select name="sort"><option value="newest" @selected(request('sort','newest')==='newest')>New arrivals</option><option value="name-asc" @selected(request('sort')==='name-asc')>Name: A to Z</option><option value="weight-asc" @selected(request('sort')==='weight-asc')>Weight: low to high</option><option value="weight-desc" @selected(request('sort')==='weight-desc')>Weight: high to low</option></select></label>
-                    <div class="filter-drawer-actions"><a href="{{ route('catalog.index') }}">Clear all</a><button class="button" type="submit">Apply filters</button></div>
+                    <div class="filter-drawer-actions">
+                        <a href="{{ route('catalog.index') }}">Clear all</a>
+                        <button type="button" class="button button-outline" style="min-height: 38px; padding: 0 14px;" onclick="this.closest('details').removeAttribute('open')">Close</button>
+                        <button class="button button-gold" type="submit" style="min-height: 38px;">Apply filters</button>
+                    </div>
                 </form>
             </div>
         </details>
@@ -58,3 +62,21 @@
     @endif
 </section>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const drawer = document.querySelector('.catalog-filter-drawer');
+    if (!drawer) return;
+    document.addEventListener('click', (e) => {
+        if (drawer.open && !drawer.contains(e.target)) {
+            drawer.removeAttribute('open');
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.open) {
+            drawer.removeAttribute('open');
+        }
+    });
+});
+</script>
+@endpush
