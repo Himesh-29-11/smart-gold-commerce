@@ -18,6 +18,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\GoldPriceController;
 use App\Http\Controllers\GoldPriceDataController;
 use App\Http\Controllers\HomeController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Admin\IssueController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -34,6 +36,8 @@ Route::get('/gold/{product:slug}', [CatalogController::class, 'show'])->name('ca
 Route::get('/gold-prices', GoldPriceController::class)->name('gold-prices');
 Route::get('/gold-prices/data', GoldPriceDataController::class)->middleware('throttle:120,1')->name('gold-prices.data');
 Route::get('/gold-loan-assistance', [LoanController::class, 'index'])->name('loans.index');
+Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+Route::post('/faq/issues', [FaqController::class, 'storeIssue'])->middleware('throttle:5,1')->name('faq.issues.store');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
@@ -109,5 +113,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'otp', 'ad
     Route::patch('/loans/{loan}', [AdminLoanController::class, 'update'])->name('loans.update');
     Route::get('/customers', [AdminCustomerController::class, 'index'])->name('customers.index');
     Route::patch('/customers/{user}/toggle', [AdminCustomerController::class, 'toggle'])->name('customers.toggle');
+    Route::get('/issues', [IssueController::class, 'index'])->name('issues.index');
+    Route::patch('/issues/{issue}', [IssueController::class, 'update'])->name('issues.update');
     Route::get('/reports/orders.csv', [AdminReportController::class, 'ordersCsv'])->name('reports.orders');
 });

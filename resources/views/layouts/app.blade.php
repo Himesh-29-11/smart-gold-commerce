@@ -25,6 +25,7 @@
             <a href="{{ route('catalog.index') }}" @class(['active' => request()->routeIs('catalog.*')])>Shop gold</a>
             <a href="{{ route('gold-prices') }}" @class(['active' => request()->routeIs('gold-prices')])>Live rates</a>
             <a href="{{ route('loans.index') }}" @class(['active' => request()->routeIs('loans.*')])>Gold financing</a>
+            <a href="{{ route('faq') }}" @class(['active' => request()->routeIs('faq')])>FAQ &amp; Support</a>
             @auth
                 <a href="{{ route('wishlist.index') }}">♡ Wishlist</a>
                 <a href="{{ route('account.notifications') }}">Notifications <span class="nav-count">{{ auth()->user()->unreadNotifications()->count() }}</span></a>

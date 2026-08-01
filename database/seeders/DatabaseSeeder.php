@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::updateOrCreate(['email' => 'admin@nhtrust.test'], ['name' => 'System Administrator', 'phone' => '9876500001', 'password' => Hash::make('Admin@12345'), 'role' => 'admin', 'is_active' => true, 'email_verified_at' => now(), 'otp_verified_at' => now()]);
-        $customer = User::updateOrCreate(['email' => 'customer@nhtrust.test'], ['name' => 'Demo Customer', 'phone' => '9876500002', 'password' => Hash::make('Customer@123'), 'role' => 'customer', 'is_active' => true, 'email_verified_at' => now(), 'otp_verified_at' => now()]);
-        $driver = User::updateOrCreate(['email' => 'driver@nhtrust.test'], ['name' => 'Demo Driver', 'phone' => '9876500003', 'password' => Hash::make('Driver@12345'), 'role' => 'driver', 'is_active' => true, 'email_verified_at' => now(), 'otp_verified_at' => now()]);
+        $admin = User::updateOrCreate(['email' => 'admin@nhtrust.test'], ['customer_code' => 1001, 'name' => 'System Administrator', 'phone' => '9876500001', 'password' => Hash::make('Admin@12345'), 'role' => 'admin', 'is_active' => true, 'email_verified_at' => now(), 'otp_verified_at' => now()]);
+        $customer = User::updateOrCreate(['email' => 'customer@nhtrust.test'], ['customer_code' => 1002, 'name' => 'Demo Customer', 'phone' => '9876500002', 'password' => Hash::make('Customer@123'), 'role' => 'customer', 'is_active' => true, 'email_verified_at' => now(), 'otp_verified_at' => now()]);
+        $driver = User::updateOrCreate(['email' => 'driver@nhtrust.test'], ['customer_code' => 1003, 'name' => 'Demo Driver', 'phone' => '9876500003', 'password' => Hash::make('Driver@12345'), 'role' => 'driver', 'is_active' => true, 'email_verified_at' => now(), 'otp_verified_at' => now()]);
 
         $categories = collect([
             ['name' => 'Gold Coins', 'slug' => 'coins', 'description' => 'Certified coins for gifting, saving and auspicious occasions.', 'image_url' => '/images/products/gold-coin.jpg'],

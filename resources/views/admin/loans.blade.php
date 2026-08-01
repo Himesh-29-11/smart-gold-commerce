@@ -14,7 +14,7 @@
         <div class="loan-admin-list">
             @forelse ($loans as $loan)
                 <article>
-                    <div class="loan-admin-head"><div><b>{{ $loan->reference }}</b><span>{{ $loan->created_at->format('d M Y, h:i A') }} · {{ $loan->user->name }} · {{ $loan->user->email }}</span></div><span class="status status-{{ $loan->status }}">{{ str_replace('_', ' ', $loan->status) }}</span></div>
+                    <div class="loan-admin-head"><div><b>{{ $loan->reference }}</b><span>{{ $loan->created_at->format('d M Y, h:i A') }} · #{{ $loan->user->customer_code ?? $loan->user->id }} — {{ $loan->user->name }} · {{ $loan->user->email }}</span></div><span class="status status-{{ $loan->status }}">{{ str_replace('_', ' ', $loan->status) }}</span></div>
                     <div class="loan-metrics">
                         <span><small>Provider</small><b>{{ $loan->partner?->name ?? 'Unassigned' }}</b></span><span><small>Requested</small><b>₹{{ number_format($loan->requested_amount) }}</b></span><span><small>Income / month</small><b>₹{{ number_format($loan->monthly_income) }}</b></span><span><small>Estimated EMI</small><b>₹{{ number_format($loan->estimated_emi) }}</b></span><span><small>Affordability</small><b>{{ $loan->eligibility_score }}/100</b></span><span><small>Documents stated</small><b>{{ implode(', ', $loan->documents ?? []) }}</b></span>
                     </div>

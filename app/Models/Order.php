@@ -9,7 +9,21 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
-    protected $fillable = ['user_id', 'reference', 'status', 'payment_status', 'subtotal', 'discount', 'tax', 'delivery_charge', 'total', 'coupon_code', 'shipping_address', 'notes'];
+    protected $fillable = ['user_id', 'order_code', 'reference', 'status', 'payment_status', 'subtotal', 'discount', 'tax', 'delivery_charge', 'total', 'coupon_code', 'shipping_address', 'notes'];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Order $order): void {
+            if (empty($order->order_code)) {
+                $max = (int) static::max('order_code');
+                $orderCode = max(5001, $max + 1);
+                $order->order_code = $orderCode;
+                if (empty($order->reference)) {
+                    $order->reference = 'SGC-'.$orderCode;
+                }
+            }
+        });
+    }
 
     protected function casts(): array
     {
