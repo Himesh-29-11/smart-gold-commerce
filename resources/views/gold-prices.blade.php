@@ -80,7 +80,7 @@
             <article class="market-metric-card feed-metric-card">
                 <span class="metric-label">{{ $dataMode === 'live' ? 'Data status' : 'Demo status' }}</span>
                 <strong id="market-freshness">{{ $service->isStale($rates['24K']) ? 'Stale' : 'Current' }}</strong>
-                <p id="market-source">Source: {{ $service->activeSource() === 'ahmedabad-sarafa-bullion' ? 'Ahmedabad Sarafa Bazaar (MCX Bullion Linked)' : ($service->activeSource() ?? 'Not configured') }}</p>
+                <p id="market-source">Source: {{ $service->activeSource() === 'ahmedabad-sarafa-bullion' ? 'Ahmedabad Sarafa Bazaar (24K & 22K Live Market Rate)' : ($service->activeSource() ?? 'Not configured') }}</p>
                 <a href="{{ route('catalog.index') }}">Browse certified gold →</a>
             </article>
         </div>

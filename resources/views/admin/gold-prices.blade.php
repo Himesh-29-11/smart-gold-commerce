@@ -104,16 +104,16 @@
         <!-- 1. Ahmedabad Bullion Feed (Recommended for Ahmedabad/Gujarat) -->
         <div style="background: #fbf9f5; border: 1px solid #dcc08b; padding: 18px; border-radius: 10px; margin-bottom: 16px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <strong style="color: #4a0404; font-size: 14px;">1. Ahmedabad Bullion Market Feed</strong>
+                <strong style="color: #4a0404; font-size: 14px;">1. Ahmedabad Sarafa Bazaar (24K &amp; 22K Live Feed)</strong>
                 <span class="badge badge-gold">Gujarat MCX Linked</span>
             </div>
             <p style="font-size: 12px; color: #69746f; margin-bottom: 12px; line-height: 1.5;">
-                Synchronizes the Ahmedabad Sarafa Bazaar 22K and 24K bullion rate (+{{ $ahmedabadPremium }}% differential over spot INR). Automatically uses your <code>GOLD_PRICE_API_KEY</code> from .env if present.
+                Synchronizes the Ahmedabad Sarafa Bazaar 22K and 24K gold rates (+{{ $ahmedabadPremium }}% differential over spot INR). Automatically uses your <code>GOLD_PRICE_API_KEY</code> from .env if present.
             </p>
             <form method="POST" action="{{ route('admin.gold-prices.fetch-ahmedabad') }}" style="margin: 0;">
                 @csrf
                 <button class="button button-gold full" type="submit" style="min-height: 44px;">
-                    Sync Ahmedabad Bullion Rate (MCX + Sarafa Bazaar)
+                    Sync Ahmedabad 24K &amp; 22K Live Rate (MCX + Sarafa Bazaar)
                 </button>
             </form>
         </div>
