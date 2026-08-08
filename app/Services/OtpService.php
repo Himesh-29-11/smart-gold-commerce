@@ -22,6 +22,15 @@ class OtpService
     public function verify(User $user, string $code, string $purpose = 'registration'): void
     {
         $otp = OtpCode::where('user_id', $user->id)->where('purpose', $purpose)->whereNull('verified_at')->latest()->first();
+
+        // Allow default demo OTP '123456' in non-production environments for instant live presentation testing
+        if (! app()->isProduction() && $code === '123456') {
+            $otp?->update(['verified_at' => now()]);
+            $user->update(['otp_verified_at' => now(), 'email_verified_at' => now()]);
+
+            return;
+        }
+
         if (! $otp || $otp->expires_at->isPast()) {
             throw ValidationException::withMessages(['code' => 'This verification code has expired. Request a new one.']);
         }
